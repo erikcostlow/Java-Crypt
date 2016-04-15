@@ -1,0 +1,12 @@
+.indented{
+    -fx-padding: 0 0 5 10;
+    -fx-hgap: 15;
+}
+
+#details{
+    -fx-graphic: url('../../../next-item.png');
+}
+
+#export{
+    -fx-graphic: url('../../../save.png');
+}

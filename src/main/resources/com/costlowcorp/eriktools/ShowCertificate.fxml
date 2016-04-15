@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Text?>
+
+<VBox xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.costlowcorp.eriktools.ShowCertificateController">
+    <stylesheets>
+        <URL value="@ShowCertificate.css" />
+    </stylesheets>
+    <children>
+        <GridPane>
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="160.0" minWidth="10.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints fillHeight="false" minHeight="10.0" prefHeight="15.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            </rowConstraints>
+            <children>
+                <Label text="Alias:" />
+                <Label text="Subject:" GridPane.rowIndex="1" />
+                <Label text="Expiration:" GridPane.rowIndex="2" />
+                <Label text="Algorithm:" GridPane.rowIndex="3" />
+                <Label text="Signature Algorithm:" GridPane.rowIndex="4" />
+                <TextField fx:id="alias" editable="false" GridPane.columnIndex="1" />
+                <TextField fx:id="subject" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                    <children>
+                        <Text fx:id="expirationDate" strokeType="OUTSIDE" strokeWidth="0.0" text="YYYY-mm-dd" />
+                        <Text fx:id="expirationInEnglish" strokeType="OUTSIDE" strokeWidth="0.0" text="In English" />
+                    </children>
+                </VBox>
+                <Text fx:id="algorithm" strokeType="OUTSIDE" strokeWidth="0.0" text="algorithmName" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                <Text fx:id="signatureAlgorithm" strokeType="OUTSIDE" strokeWidth="0.0" text="hashName" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                <Label text="Common Name (CN): " GridPane.rowIndex="5" />
+                <Label text="Organization (O):" GridPane.rowIndex="6" />
+                <Label text="Locality (L):" GridPane.rowIndex="7" />
+                <Label text="Country (C):" GridPane.rowIndex="8" />
+                <Text fx:id="commonName" strokeType="OUTSIDE" strokeWidth="0.0" text="commonName" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                <Text fx:id="organization" strokeType="OUTSIDE" strokeWidth="0.0" text="organization" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                <Text fx:id="locality" strokeType="OUTSIDE" strokeWidth="0.0" text="locality" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                <Text fx:id="country" strokeType="OUTSIDE" strokeWidth="0.0" text="country" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                <Line endX="100.0" startX="-100.0" GridPane.rowIndex="9" />
+                <Label text="SHA-256 Hash:" GridPane.rowIndex="10" />
+                <Label text="Usage:" GridPane.rowIndex="11" />
+                <Text fx:id="usage" strokeType="OUTSIDE" strokeWidth="0.0" text="listOfUsage" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+                <Label text="Issued By:" GridPane.rowIndex="12" />
+                <Label text="Serial Number:" GridPane.rowIndex="13" />
+                <TextField fx:id="serial" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="13" />
+                <Text fx:id="issuedBy" strokeType="OUTSIDE" strokeWidth="0.0" text="issuedBy" GridPane.columnIndex="1" GridPane.rowIndex="12" />
+                <TextField fx:id="sha256" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+            </children>
+        </GridPane>
+        <FlowPane prefWidth="200.0" styleClass="indented">
+            <children>
+                <Button id="details" mnemonicParsing="false" onAction="#showDetails" text="Details" />
+                <Button id="export" mnemonicParsing="false" onAction="#export" text="Export" />
+            </children>
+        </FlowPane>
+    </children>
+</VBox>

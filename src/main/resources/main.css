@@ -1,0 +1,55 @@
+.blah{
+    -fx-font-size: 100pt;
+    color: #0000ff;
+}
+
+.h1{
+    -fx-font-size: 15pt;
+}
+
+.osiconbutton{
+    -fx-scale-x: .6;
+    -fx-scale-y: .6;
+}
+
+/*.warning{
+-fx-font-size: 25pt;
+    -fx-background-color: #FFB90F;
+}*/
+
+.label.warning{
+    -fx-background-color: #FFB90F;
+}
+.cell.warning{
+    -fx-control-inner-background: #FFB90F;
+}
+.cell.warning:selected{
+    -fx-background-color: linear-gradient(
+                                  to bottom,
+                                  derive(orange,-7%) 0%,
+                                  derive(orangered,-34%) 100%
+                              );
+    -fx-text-fill: white;
+}
+
+.error{
+    -fx-text-fill: white;
+}
+.label.error{
+    -fx-background-color: #ff0000;
+}
+.cell.error{
+    -fx-control-inner-background: red;
+}
+.cell.error:selected{
+    -fx-background-color: linear-gradient(
+                                to bottom,
+                                derive(red,-7%) 0%,
+                                derive(crimson,-34%) 100%
+                              );
+}
+
+.working{
+    -fx-background-color: blue;
+    -fx-text-fill: white;
+}
