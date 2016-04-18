@@ -18,6 +18,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
@@ -93,7 +94,13 @@ public class ListKnownKeyStoresController implements Initializable {
                     keystoreContents.getChildren().add(grouped);
                 });
             } catch (Exception e) {
-
+                final FXMLLoader loader = UIUtils.load(ErrorMessageController.class);
+                final ErrorMessageController controller = loader.getController();
+                controller.setTitle(e.getClass().getSimpleName().replace("Exception", ""));
+                controller.setText(e.getMessage());
+                final Node node = loader.getRoot();
+                Platform.runLater(() -> keystoreContents.getChildren().setAll(node));
+                e.printStackTrace();
             }
         }).start();
     }

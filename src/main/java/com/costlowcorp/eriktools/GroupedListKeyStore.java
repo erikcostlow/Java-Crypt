@@ -1,6 +1,7 @@
 package com.costlowcorp.eriktools;
 
 import com.costlowcorp.eriktools.back.CertificateAccessor;
+import com.costlowcorp.eriktools.back.CertificateUtilities;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -18,23 +19,24 @@ import java.security.cert.Certificate;
 import java.util.*;
 
 /**
- * Display the contents of a certificate keystore grouped by Organization.
- * A separate file is used to determine Merger & Acquisition activity amongst Certificate Authorities and group
- * situations where one Certificate Authority acquired another and just hasn't updated the name on the certificate
- * (fair behavior).
- * Created by ecostlow on 4/24/14.
+ * Display the contents of a certificate keystore grouped by Organization. A
+ * separate file is used to determine Merger & Acquisition activity amongst
+ * Certificate Authorities and group situations where one Certificate Authority
+ * acquired another and just hasn't updated the name on the certificate (fair
+ * behavior). Created by ecostlow on 4/24/14.
  */
-public class GroupedListKeyStore extends TreeTableView<CertificateAccessor> {
+public class GroupedListKeyStore extends TreeTableView<GroupedListKeyStoreItem> {
 
-    public GroupedListKeyStore(KeyStore keyStore){
+    public GroupedListKeyStore(KeyStore keyStore) {
 
-        TreeTableColumn<CertificateAccessor, String> trustedCol = new TreeTableColumn<>("Type");
+        TreeTableColumn<GroupedListKeyStoreItem, String> trustedCol = new TreeTableColumn<>("Type");
         trustedCol.setCellValueFactory(vf -> {
-            if(vf.getValue().getValue().getCertificate()==null){
+            final GroupedListKeyStoreItem item = vf.getValue().getValue();
+            if (item.getCertificate() == null) {
                 return new SimpleStringProperty("");
             }
             try {
-                final String alias = keyStore.getCertificateAlias(vf.getValue().getValue().getCertificate());
+                final String alias = item.getName();
                 final String s = keyStore.isKeyEntry(alias) ? "Private" : "Public";
                 return new SimpleStringProperty(s);
             } catch (KeyStoreException e) {
@@ -42,36 +44,33 @@ public class GroupedListKeyStore extends TreeTableView<CertificateAccessor> {
             }
         });
 
-        final TreeTableColumn<CertificateAccessor, String> ownerCol = new TreeTableColumn<>("Owner");
+        final TreeTableColumn<GroupedListKeyStoreItem, String> ownerCol = new TreeTableColumn<>("Owner");
         ownerCol.setCellValueFactory(cvf -> {
             {
-                try {
-                    if(cvf.getValue().getValue().getCertificate()==null){
-                        cvf.getValue().setGraphic(new ImageView("/folder.png"));
-                        return new ReadOnlyStringWrapper(cvf.getValue().getValue().getOwnerAttribute());
-                    }
-                    final StringProperty retval = new SimpleStringProperty(keyStore.getCertificateAlias(cvf.getValue().getValue().getCertificate()));
-                    return retval;
-                } catch (KeyStoreException e) {
-                    return null;
+                final GroupedListKeyStoreItem item = cvf.getValue().getValue();
+
+                if (item.getCertificate() == null) {
+                    cvf.getValue().setGraphic(new ImageView("/folder.png"));
+                    return new ReadOnlyStringWrapper(item.getAttributes().getOrDefault("O", item.getName()));
                 }
+                final StringProperty retval = new SimpleStringProperty(item.getName());
+                return retval;
             }
         });
 
         //From observation, lots of people seem to have quotes or spaces in their attributes, so ignore when sorting.
         ownerCol.setComparator((o1, o2) -> o1.trim().replaceAll("\"", "").compareToIgnoreCase(o2.trim().replaceAll("\"", "")));
 
-        final TreeTableColumn<CertificateAccessor, String> expCol = new TreeTableColumn<>("Expires On");
-        expCol.setCellValueFactory(cvf -> new ReadOnlyStringWrapper(cvf.getValue().getValue().getExpirationDate()));
+        final TreeTableColumn<GroupedListKeyStoreItem, String> expCol = new TreeTableColumn<>("Expires On");
+        expCol.setCellValueFactory(cvf -> new ReadOnlyStringWrapper(cvf.getValue().getValue().getExpiration()));
 
-        TreeTableColumn<CertificateAccessor, String> algCol = new TreeTableColumn<>("Algorithm");
+        TreeTableColumn<GroupedListKeyStoreItem, String> algCol = new TreeTableColumn<>("Algorithm");
         algCol.setCellValueFactory(cvf -> new ReadOnlyStringWrapper(cvf.getValue().getValue().getAlgorithm()));
 
-        TreeTableColumn<CertificateAccessor, String> sigAlgCol = new TreeTableColumn<>("Signature");
-        sigAlgCol.setCellValueFactory(cvf -> new ReadOnlyStringWrapper(cvf.getValue().getValue().getSignatureAlgorithmTruncated()));
+        TreeTableColumn<GroupedListKeyStoreItem, String> sigAlgCol = new TreeTableColumn<>("Signature");
+        sigAlgCol.setCellValueFactory(cvf -> new ReadOnlyStringWrapper(cvf.getValue().getValue().getSignatureAlgorithm()));
 
-
-        final TreeItem<CertificateAccessor> root = new TreeItem<>(new CertificateAccessorFaker(""));
+        final TreeItem<GroupedListKeyStoreItem> root = new TreeItem<>(new GroupedListKeyStoreItem("root"));
         setRoot(root);
         setShowRoot(false);
 
@@ -91,8 +90,8 @@ public class GroupedListKeyStore extends TreeTableView<CertificateAccessor> {
      * If a certificate belongs to a conglomerate, nest it appropriately.
      * If the certificate belongs to a Certificate Authority outside of M&A activity, create a new group.
      */
-    private void populate(TreeItem<CertificateAccessor> root, KeyStore keyStore){
-        final ObservableList<CertificateAccessor> certificateOL = convertToOL(keyStore);
+    private void populate(TreeItem<GroupedListKeyStoreItem> root, KeyStore keyStore) {
+        final ObservableList<GroupedListKeyStoreItem> certificateOL = convertToOL(keyStore);
         final Properties whoOwnsWho = new Properties();
         try {
             whoOwnsWho.load(getClass().getClassLoader().getResourceAsStream("whoOwnsWho.properties"));
@@ -100,9 +99,9 @@ public class GroupedListKeyStore extends TreeTableView<CertificateAccessor> {
             e.printStackTrace();
         }
 
-        final Map<String, TreeItem<CertificateAccessor>> largePlayers = new HashMap<>();
+        final Map<String, TreeItem<GroupedListKeyStoreItem>> largePlayers = new HashMap<>();
         whoOwnsWho.stringPropertyNames().stream().sorted().forEach(player -> {
-            final TreeItem<CertificateAccessor> item = new TreeItem<>(new CertificateAccessorFaker(player));
+            final TreeItem<GroupedListKeyStoreItem> item = new TreeItem<>(new GroupedListKeyStoreItem(player));
             item.setExpanded(true);
             final String[] subs = whoOwnsWho.getProperty(player).split("\\|");
             Arrays.asList(subs).stream().forEach(sub -> largePlayers.put(sub.toLowerCase(), item));
@@ -111,30 +110,31 @@ public class GroupedListKeyStore extends TreeTableView<CertificateAccessor> {
         });
 
         certificateOL.stream().forEach(ca -> {
-            final String owner = ca.getOwnerAttribute().toLowerCase();
-            if(largePlayers.containsKey(owner)){
-                largePlayers.get(owner).getChildren().add(new TreeItem<>(ca));
-            }else{
-                final TreeItem<CertificateAccessor> holder = new TreeItem<>(new CertificateAccessorFaker(ca.getOwnerAttribute()));
+            final String owner = ca.getAttributes().get("O");
+            final String ownerLCase = owner.toLowerCase();
+            if (largePlayers.containsKey(ownerLCase)) {
+                largePlayers.get(ownerLCase).getChildren().add(new TreeItem<>(ca));
+            } else {
+                final TreeItem<GroupedListKeyStoreItem> holder = new TreeItem<>(new GroupedListKeyStoreItem(owner));
                 root.getChildren().add(holder);
                 holder.setExpanded(true);
                 holder.getChildren().add(new TreeItem<>(ca));
-                largePlayers.put(owner, holder);
+                largePlayers.put(ownerLCase, holder);
             }
         });
 
         root.getChildren().removeIf(child -> child.getChildren().isEmpty());
     }
 
-    private ObservableList<CertificateAccessor> convertToOL(KeyStore keyStore) {
-        final ObservableList<CertificateAccessor> retval = FXCollections.observableArrayList();
+    private ObservableList<GroupedListKeyStoreItem> convertToOL(KeyStore keyStore) {
+        final ObservableList<GroupedListKeyStoreItem> retval = FXCollections.observableArrayList();
         final Enumeration<String> certificateEnum;
         try {
             certificateEnum = keyStore.aliases();
             while (certificateEnum.hasMoreElements()) {
                 final String alias = certificateEnum.nextElement();
                 final Certificate cert = keyStore.getCertificate(alias);
-                final CertificateAccessor accessor = new CertificateAccessor(cert);
+                final GroupedListKeyStoreItem accessor = new GroupedListKeyStoreItem(alias, cert);
                 retval.add(accessor);
             }
         } catch (KeyStoreException e) {
@@ -143,36 +143,4 @@ public class GroupedListKeyStore extends TreeTableView<CertificateAccessor> {
         return retval;
     }
 
-    private static class CertificateAccessorFaker extends CertificateAccessor{
-        private final String fakeOwner;
-        public CertificateAccessorFaker(String fakeOwner){
-            super(null);
-            this.fakeOwner = fakeOwner;
-        }
-
-        @Override
-        public String getOwnerAttribute(){
-            return fakeOwner;
-        }
-
-        @Override
-        public String getExpirationDate() {
-            return null;
-        }
-
-        @Override
-        public String getAlgorithm() {
-            return null;
-        }
-
-        @Override
-        public String getSignatureAlgorithm() {
-            return null;
-        }
-
-        @Override
-        public String getSignatureAlgorithmTruncated() {
-            return null;
-        }
-    }
 }

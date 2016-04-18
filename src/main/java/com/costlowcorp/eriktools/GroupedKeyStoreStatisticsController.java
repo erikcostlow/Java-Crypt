@@ -8,6 +8,7 @@ package com.costlowcorp.eriktools;
 import com.costlowcorp.eriktools.back.CertificateAccessor;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -39,7 +40,7 @@ public class GroupedKeyStoreStatisticsController implements Initializable {
     }
 
     void initialize(GroupedListKeyStore list) {
-        final TreeItem<CertificateAccessor> root = list.getRoot();
+        final TreeItem<GroupedListKeyStoreItem> root = list.getRoot();
         final AtomicInteger totalCerts = new AtomicInteger(0);
         final AtomicInteger groups = new AtomicInteger(0);
 
@@ -48,10 +49,10 @@ public class GroupedKeyStoreStatisticsController implements Initializable {
             groups.incrementAndGet();
             totalCerts.addAndGet(group.getChildren().size());
             group.getChildren().stream().map(el -> el.getValue())
-                    .flatMap(acc -> acc.getFields().stream())
-                    .filter(el -> "C".equals(el.getName()))
+                    .map(el -> el.getAttributes().get("C"))
+                    .filter(Objects::nonNull)
                     .findAny()
-                    .ifPresent(acc -> countryCodes.add(acc.getValue()));
+                    .ifPresent(acc -> countryCodes.add(acc));
         });
         final int countries = countryCodes.size();
         
