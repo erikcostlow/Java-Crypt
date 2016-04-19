@@ -11,6 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Text?>
+<?import javafx.scene.text.TextFlow?>
 
 <VBox xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.costlowcorp.eriktools.ShowCertificateController">
     <stylesheets>
@@ -32,7 +33,7 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints fillHeight="false" minHeight="10.0" prefHeight="15.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="15.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -46,12 +47,6 @@
                 <Label text="Signature Algorithm:" GridPane.rowIndex="4" />
                 <TextField fx:id="alias" editable="false" GridPane.columnIndex="1" />
                 <TextField fx:id="subject" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                    <children>
-                        <Text fx:id="expirationDate" strokeType="OUTSIDE" strokeWidth="0.0" text="YYYY-mm-dd" />
-                        <Text fx:id="expirationInEnglish" strokeType="OUTSIDE" strokeWidth="0.0" text="In English" />
-                    </children>
-                </VBox>
                 <Text fx:id="algorithm" strokeType="OUTSIDE" strokeWidth="0.0" text="algorithmName" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                 <Text fx:id="signatureAlgorithm" strokeType="OUTSIDE" strokeWidth="0.0" text="hashName" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                 <Label text="Common Name (CN): " GridPane.rowIndex="5" />
@@ -71,6 +66,13 @@
                 <TextField fx:id="serial" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="13" />
                 <Text fx:id="issuedBy" strokeType="OUTSIDE" strokeWidth="0.0" text="issuedBy" GridPane.columnIndex="1" GridPane.rowIndex="12" />
                 <TextField fx:id="sha256" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+            <TextFlow GridPane.columnIndex="1" GridPane.rowIndex="2">
+               <children>
+                  <Text fx:id="expirationDate" strokeType="OUTSIDE" strokeWidth="0.0" text="YYYY-mm-dd" />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text=" or " />
+                  <Text fx:id="expirationInEnglish" strokeType="OUTSIDE" strokeWidth="0.0" text="In English" />
+               </children>
+            </TextFlow>
             </children>
         </GridPane>
         <FlowPane prefWidth="200.0" styleClass="indented">
