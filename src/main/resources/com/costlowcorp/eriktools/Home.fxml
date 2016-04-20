@@ -7,7 +7,6 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.TabPane?>
-<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
@@ -37,11 +36,11 @@
       </MenuBar>
       <StackPane VBox.vgrow="ALWAYS">
          <children>
-            <Pane prefHeight="200.0" prefWidth="200.0">
+            <VBox>
                <children>
-                  <Label text="Label" />
+                  <Label text="This is a tool to conslidate a lot of things I do into a basic tool." wrapText="true" />
                </children>
-            </Pane>
+            </VBox>
             <TabPane fx:id="tabs">
                <opaqueInsets>
                   <Insets />
