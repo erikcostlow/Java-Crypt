@@ -6,18 +6,16 @@
 package com.costlowcorp.eriktools;
 
 import com.costlowcorp.fx.utils.UIUtils;
+import static com.sun.javafx.image.impl.ByteGrayAlphaPre.accessor;
 import java.net.URL;
 import java.security.cert.Certificate;
 import java.util.ResourceBundle;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.Pane;
 
@@ -55,7 +53,7 @@ public class ImportCertificateController implements Initializable {
         // TODO
         certChain.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue!=null && newValue.getValue()!=null){
-                showCertificateController.initilize(accessor, alias);
+                showCertificateController.initilize(newValue.getValue(), alias.getText());
             }
         });
     }    

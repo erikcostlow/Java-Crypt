@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -45,9 +47,16 @@ public class ListKnownKeyStoresController implements Initializable {
     @FXML
     private AnchorPane keystoreContents;
 
+    private ShowCertificateController showController;
+
+    private Node showPane;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         populateKeyStores();
+        final FXMLLoader showLoader = UIUtils.load(ShowCertificateController.class);
+        showController = showLoader.getController();
+        showPane = showLoader.getRoot();
     }
 
     private void populateKeyStores() {
@@ -86,10 +95,26 @@ public class ListKnownKeyStoresController implements Initializable {
                 final FXMLLoader stats = UIUtils.load(GroupedKeyStoreStatisticsController.class);
                 final GroupedKeyStoreStatisticsController statsController = stats.getController();
                 statsController.initialize(grouped);
+                final Node statsRoot = stats.getRoot();
                 
-                UIUtils.setAnchors(grouped, 0,0,0,0);
+                grouped.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<GroupedListKeyStoreItem>>() {
+                    @Override
+                    public void changed(ObservableValue<? extends TreeItem<GroupedListKeyStoreItem>> observable, TreeItem<GroupedListKeyStoreItem> oldValue, TreeItem<GroupedListKeyStoreItem> newValue) {
+                        if (newValue != null && newValue.getValue() != null) {
+                            if (newValue.getValue().getCertificate() == null) {
+                                detailArea.setContent(statsRoot);
+                            } else {
+                                showController.initilize(newValue.getValue().getCertificate(), newValue.getValue().getName());
+                                detailArea.setContent(showPane);
+                            }
+                        }
+                    }
+
+                });
+
+                UIUtils.setAnchors(grouped, 0, 0, 0, 0);
                 Platform.runLater(() -> {
-                    detailArea.setContent(stats.getRoot());
+                    detailArea.setContent(statsRoot);
                     keystoreContents.getChildren().clear();
                     keystoreContents.getChildren().add(grouped);
                 });

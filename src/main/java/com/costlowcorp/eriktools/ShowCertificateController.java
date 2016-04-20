@@ -5,8 +5,10 @@
  */
 package com.costlowcorp.eriktools;
 
-import com.costlowcorp.eriktools.back.CertificateAccessor;
+import com.costlowcorp.eriktools.back.CertificateUtilities;
 import java.net.URL;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -96,19 +98,20 @@ public class ShowCertificateController implements Initializable {
         // TODO
     }
 
-    void initilize(CertificateAccessor accessor, String alias) {
+    void initilize(Certificate certificate, String alias) {
         this.alias.textProperty().setValue(alias);
-        subject.setText(accessor.forWhom());
-        expirationDate.setText(accessor.getExpirationDate());
+        subject.setText(CertificateUtilities.forWhom(certificate));
+        expirationDate.setText(CertificateUtilities.getExpirationDate(certificate));
         expirationInEnglish.setText("...");
-        algorithm.setText(accessor.getAlgorithm());
-        signatureAlgorithm.setText(accessor.getSignatureAlgorithm());
+        algorithm.setText(CertificateUtilities.getAlgorithm(certificate));
+        signatureAlgorithm.setText(CertificateUtilities.getSignatureAlgorithm(certificate));
         
-        sha256.setText(accessor.sha256());
-        final String issuer = accessor.getCertificate().getSubjectDN().equals(accessor.getCertificate().getIssuerDN()) ?
-                "Self-issued" : String.valueOf(accessor.getCertificate().getIssuerDN());
+        sha256.setText(CertificateUtilities.sha256(certificate));
+        final X509Certificate x509 = (X509Certificate) certificate;
+        final String issuer = x509.getSubjectDN().equals(x509.getIssuerDN()) ?
+                "Self-issued" : String.valueOf(x509.getIssuerDN());
         issuedBy.setText(issuer);
-        serial.setText(String.valueOf(accessor.getCertificate().getSerialNumber()));
+        serial.setText(String.valueOf(x509.getSerialNumber()));
     }
 
     public void showDetails(ActionEvent e) {

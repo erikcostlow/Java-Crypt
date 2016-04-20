@@ -1,7 +1,5 @@
 package com.costlowcorp.eriktools;
 
-import com.costlowcorp.eriktools.back.CertificateAccessor;
-import com.costlowcorp.eriktools.back.CertificateUtilities;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
