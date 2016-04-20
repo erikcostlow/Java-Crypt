@@ -6,7 +6,6 @@
 package com.costlowcorp.eriktools;
 
 import com.costlowcorp.fx.utils.UIUtils;
-import static com.sun.javafx.image.impl.ByteGrayAlphaPre.accessor;
 import java.net.URL;
 import java.security.cert.Certificate;
 import java.util.ResourceBundle;
