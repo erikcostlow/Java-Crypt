@@ -5,6 +5,7 @@
  */
 package com.costlowcorp.eriktools;
 
+import com.costlowcorp.eriktools.checksum.ChecksumFileController;
 import com.costlowcorp.fx.utils.UIUtils;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -40,6 +41,14 @@ public class HomeController implements Initializable {
         
         final Tab newTab = new Tab("System", root);
         tabs.getTabs().add(newTab);
+    }
+    
+    public void openChecksum(ActionEvent e){
+        final FXMLLoader loader = UIUtils.load(ChecksumFileController.class);
+        final Pane root = loader.getRoot();
+        
+        final Tab tab = new Tab("Checksum", root);
+        tabs.getTabs().add(tab);
     }
 
     public void openFile(ActionEvent event) {
