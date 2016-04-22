@@ -52,12 +52,21 @@ public class GroupedListKeyStore extends TreeTableView<GroupedListKeyStoreItem> 
                     return new ReadOnlyStringWrapper(item.getAttributes().getOrDefault("O", item.getName()));
                 }
                 final StringProperty retval = new SimpleStringProperty(item.getName());
+                cvf.getValue().setGraphic(null);
                 return retval;
             }
         });
 
         //From observation, lots of people seem to have quotes or spaces in their attributes, so ignore when sorting.
         ownerCol.setComparator((o1, o2) -> o1.trim().replaceAll("\"", "").compareToIgnoreCase(o2.trim().replaceAll("\"", "")));
+        
+        final TreeTableColumn<GroupedListKeyStoreItem, String> cnCol = new TreeTableColumn<>("Common Name (CN)");
+        cnCol.setCellValueFactory(cvf -> {
+            final GroupedListKeyStoreItem item = cvf.getValue().getValue();
+            final String str = item.getCertificate()==null ? "" : item.getAttributes().getOrDefault("CN", "Unspecified");
+            final StringProperty retval = new SimpleStringProperty(str);
+            return retval;
+        });
 
         final TreeTableColumn<GroupedListKeyStoreItem, String> expCol = new TreeTableColumn<>("Expires On");
         expCol.setCellValueFactory(cvf -> new ReadOnlyStringWrapper(cvf.getValue().getValue().getExpiration()));
@@ -74,7 +83,7 @@ public class GroupedListKeyStore extends TreeTableView<GroupedListKeyStoreItem> 
 
         populate(root, keyStore);
 
-        getColumns().addAll(ownerCol, trustedCol, expCol, algCol, sigAlgCol);
+        getColumns().addAll(ownerCol, cnCol, trustedCol, expCol, algCol, sigAlgCol);
         setShowRoot(false);
         setTableMenuButtonVisible(true);
 
