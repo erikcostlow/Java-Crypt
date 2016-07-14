@@ -13,10 +13,12 @@ import java.util.logging.Logger;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.stage.Window;
 
 /**
  *
@@ -42,7 +44,7 @@ public class UIUtils {
         try {
             final URL url = clazz.getResource(resource);
             if (url == null) {
-                throw new FileNotFoundException("Unable to load " + url);
+                throw new FileNotFoundException("Unable to load " + url + "(" + resource + ")");
             }
             final FXMLLoader loader = new FXMLLoader(url);
             loader.load();
@@ -70,5 +72,15 @@ public class UIUtils {
         if(ZERO.compareTo(left)==0 && ZERO.compareTo(right)==0){
             HBox.setHgrow(node, Priority.ALWAYS);
         }
+    }
+    
+    /**
+     * 
+     * @param node Desired node
+     * @return The window, or null if not in a scene.
+     */
+    public static Window getWindowFor(Node node){
+        final Scene scene = node.getScene();
+        return scene==null ? null : scene.getWindow();
     }
 }
