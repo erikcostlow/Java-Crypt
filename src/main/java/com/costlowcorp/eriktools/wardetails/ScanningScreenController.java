@@ -9,6 +9,7 @@ import com.costlowcorp.eriktools.App;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -21,6 +22,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 import org.controlsfx.control.TaskProgressView;
@@ -48,10 +50,10 @@ public class ScanningScreenController implements Initializable {
     private TreeTableColumn<ArchiveOwnershipEntry, String> archiveNameCol;
     
     @FXML
-    private TreeTableColumn archiveDateCol;
+    private TreeTableColumn<ArchiveOwnershipEntry, String> archiveDateCol;
     
     @FXML
-    private TreeTableColumn ownershipCol;
+    private TreeTableColumn<ArchiveOwnershipEntry, String> archiveOwnershipCol;
     
     private Path path;
 
@@ -63,6 +65,17 @@ public class ScanningScreenController implements Initializable {
         archiveNameCol.setCellValueFactory(
             (TreeTableColumn.CellDataFeatures<ArchiveOwnershipEntry, String> param) -> 
             new ReadOnlyStringWrapper(param.getValue().getValue().getName())
+        );
+        
+        final SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
+        archiveDateCol.setCellValueFactory(
+            (TreeTableColumn.CellDataFeatures<ArchiveOwnershipEntry, String> param) -> 
+            new ReadOnlyStringWrapper(param.getValue().getValue().getWhenMade()==null ? "" : sdf.format(param.getValue().getValue().getWhenMade()))
+        );
+        
+        archiveOwnershipCol.setCellValueFactory(
+            (TreeTableColumn.CellDataFeatures<ArchiveOwnershipEntry, String> param) -> 
+            new ReadOnlyStringWrapper(String.valueOf(param.getValue().getValue().getOwnership()))
         );
     }
 
@@ -82,7 +95,8 @@ public class ScanningScreenController implements Initializable {
     
     private void afterCount(long withFolders, long justFiles){
         final Consumer<Set<String>> afterDone = set -> Platform.runLater(() -> updateOwnedPackages(set));
-        final IdentifyOwnedPackagesTask identifyTask = new IdentifyOwnedPackagesTask("Identify owned Java packages", path, withFolders, afterDone);
+        final Consumer<TreeItem> blah = f -> Platform.runLater(() -> updateTree(f));
+        final IdentifyOwnedPackagesTask identifyTask = new IdentifyOwnedPackagesTask("Identify owned Java packages", path, withFolders, afterDone, blah);
         final CountFileIntrospectTypesTask countFileTypes = new CountFileIntrospectTypesTask("Identify files", path, withFolders, chart);
 
         executeTasks(identifyTask, countFileTypes);
@@ -97,5 +111,9 @@ public class ScanningScreenController implements Initializable {
     
     private void updateOwnedPackages(Set<String> packages){
         ownedPackages.setText(String.join("\n", packages));
+    }
+    
+    private void updateTree(TreeItem root){
+        archiveTable.setRoot(root);
     }
 }

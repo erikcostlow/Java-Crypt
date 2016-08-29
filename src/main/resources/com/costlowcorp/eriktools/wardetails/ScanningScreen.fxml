@@ -26,11 +26,11 @@
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Identified from loose class files (e.g. WEB-INF/classes or non-jar)" />
                   <TextArea fx:id="ownedPackages" prefHeight="200.0" prefWidth="200.0" />
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="If you own the packages above, the following archives are..." />
-                  <TreeTableView fx:id="archiveTable" prefHeight="200.0" prefWidth="200.0">
+                  <TreeTableView fx:id="archiveTable" editable="true" prefHeight="200.0" prefWidth="200.0" showRoot="false">
                     <columns>
                       <TreeTableColumn fx:id="archiveNameCol" prefWidth="156.0" text="Archive" />
                       <TreeTableColumn fx:id="archiveDateCol" prefWidth="94.0" text="Packaged On" />
-                        <TreeTableColumn prefWidth="89.0" text="Ownership" />
+                        <TreeTableColumn fx:id="archiveOwnershipCol" prefWidth="89.0" text="Ownership" />
                     </columns>
                   </TreeTableView>
                </children>

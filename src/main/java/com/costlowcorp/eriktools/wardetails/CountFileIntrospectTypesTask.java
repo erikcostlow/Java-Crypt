@@ -98,19 +98,18 @@ public class CountFileIntrospectTypesTask extends Task<Void> {
     @Override
     protected void failed() {
         super.failed();
-        System.out.println("Failed");
+        System.out.println("Failed count file");
     }
 
     @Override
     protected void cancelled() {
         super.cancelled();
-        System.out.println("Cancelled");
+        System.out.println("Cancelled count file");
     }
 
     @Override
     protected void succeeded() {
         super.succeeded();
-        System.out.println("Succeeded");
         updateChart();
     }
 

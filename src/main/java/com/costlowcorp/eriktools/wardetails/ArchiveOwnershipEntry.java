@@ -5,6 +5,7 @@
  */
 package com.costlowcorp.eriktools.wardetails;
 
+import com.costlowcorp.eriktools.back.MadeBy;
 import java.util.Date;
 
 /**
@@ -14,7 +15,9 @@ import java.util.Date;
 public class ArchiveOwnershipEntry {
     private final String name;
     
-    private final Date whenMade;
+    private Date whenMade;
+    
+    private MadeBy madeBy=MadeBy.THIRD_PARTY;
     
     public ArchiveOwnershipEntry(String name, Date whenMade){
         this.name=name;
@@ -27,5 +30,13 @@ public class ArchiveOwnershipEntry {
 
     public Date getWhenMade() {
         return whenMade;
+    }
+
+    void setWhenMade(Date date) {
+        this.whenMade=date;
+    }
+
+    MadeBy getOwnership() {
+        return madeBy;
     }
 }

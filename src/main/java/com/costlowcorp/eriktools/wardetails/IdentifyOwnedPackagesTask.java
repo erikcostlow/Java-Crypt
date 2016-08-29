@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,19 +39,23 @@ public class IdentifyOwnedPackagesTask extends Task<Void> {
     private final double maxClasses;
     private final Consumer<Set<String>> onCompletion;
     private final Set<String> ownedPackages = new TreeSet<>();
+    private final Map<String, TreeItem> items = new HashMap<>();
+    private TreeItem root;
+    private final Consumer<TreeItem> updateTree;
 
-    public IdentifyOwnedPackagesTask(String title, Path path, long maxClasses, Consumer<Set<String>> onCompletion) {
+    public IdentifyOwnedPackagesTask(String title, Path path, long maxClasses, Consumer<Set<String>> onCompletion, Consumer<TreeItem> updateTree) {
         updateTitle(title);
         this.path = path;
         this.maxClasses = maxClasses;
         this.onCompletion = onCompletion;
+        this.updateTree = updateTree;
     }
 
     @Override
     protected Void call() throws Exception {
         final LongAdder classCount = new LongAdder();
         final Double upMaxClasses = maxClasses;
-        final Map<String, TreeItem> items = new HashMap<>();
+
         try (InputStream in = Files.newInputStream(path);
                 ZipInputStream zin = new ZipInputStream(in)) {
             final ArchiveWalkerRecipient eachFile = (t, entry, u) -> {
@@ -70,8 +76,15 @@ public class IdentifyOwnedPackagesTask extends Task<Void> {
                         if (!foundJar && !"".equals(pkg)) {
                             ownedPackages.add(pkg);
                         }
-                        
-                        nest(items, t, pkg);
+                        final List<String> names = new ArrayList<>(t.size());
+                        names.addAll(t);
+                        names.set(names.size() - 1, pkg);
+                        if (!items.containsKey(makeName(names))) {
+                            final TreeItem<ArchiveOwnershipEntry> item = nest(items, names);
+                            if (entry.getTime() != 0) {
+                                item.getValue().setWhenMade(new Date(entry.getTime()));
+                            }
+                        }
                     } catch (IOException ex) {
                         Logger.getLogger(IdentifyOwnedPackagesTask.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -80,7 +93,7 @@ public class IdentifyOwnedPackagesTask extends Task<Void> {
             };
             final ArchiveWalker walker = new ArchiveWalker(path.toString(), zin, eachFile);
             walker.walk();
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             Logger.getLogger(WarDetailsController.class.getName()).log(Level.SEVERE, "The task failed", ex);
         }
         done();
@@ -91,9 +104,31 @@ public class IdentifyOwnedPackagesTask extends Task<Void> {
     protected void succeeded() {
         super.succeeded();
         onCompletion.accept(ownedPackages);
+        updateTree.accept(root);
+
     }
 
-    private void nest(Map<String, TreeItem> items, List<String> t, String pkg) {
-        
+    private TreeItem nest(Map<String, TreeItem> items, List<String> names) {
+        final String currentName = makeName(names);
+        if (items.isEmpty() && names.size() == 1) {
+            final TreeItem item = new TreeItem(new ArchiveOwnershipEntry(names.get(names.size() - 1), new Date()));
+            items.put(currentName, item);
+            root = item;
+            item.setExpanded(true);
+            return item;
+        } else if (items.containsKey(currentName)) {
+            return items.get(currentName);
+        } else {
+            final TreeItem item = new TreeItem(new ArchiveOwnershipEntry(names.get(names.size() - 1), new Date()));
+            item.setExpanded(true);
+            final List<String> subList = names.subList(0, names.size() - 1);
+            nest(items, subList).getChildren().add(item);
+            items.put(currentName, item);
+            return item;
+        }
+    }
+
+    private static String makeName(List<String> names) {
+        return String.join("->", names);
     }
 }
