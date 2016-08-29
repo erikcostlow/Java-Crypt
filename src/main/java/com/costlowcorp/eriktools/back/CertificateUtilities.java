@@ -16,6 +16,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,9 +68,19 @@ public class CertificateUtilities {
     /**
      * @return Formatted date
      */
-    public static String getExpirationDate(Certificate certificate) {
+    public static String getExpirationDateAsString(Certificate certificate) {
         if (certificate instanceof X509Certificate) {
             return T_DATE_FORMAT.get().format(((X509Certificate) certificate).getNotAfter());
+        }
+        return null;
+    }
+    
+    /**
+     * @return Formatted date
+     */
+    public static Date getExpirationDateAsDate(Certificate certificate) {
+        if (certificate instanceof X509Certificate) {
+            return ((X509Certificate) certificate).getNotAfter();
         }
         return null;
     }

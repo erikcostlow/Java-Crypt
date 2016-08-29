@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.TextFlow?>
+
+
+<ScrollPane xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.costlowcorp.eriktools.wardetails.WarDetailsController">
+   <content>
+      <VBox>
+         <children>
+            <TextFlow prefWidth="200.0">
+               <children>
+                  <Label text="Filename.war" />
+                  <Label text=" - " />
+                  <Label text="W">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Label>
+                  <Label text="eb " />
+                  <Label text="A">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Label>
+                  <Label text="pplication A" />
+                  <Label text="R">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Label>
+                  <Label text="chive" />
+               </children>
+            </TextFlow>
+            <GridPane>
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints maxHeight="33.0" minHeight="10.0" prefHeight="22.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="54.0" minHeight="10.0" prefHeight="26.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="92.0" minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="116.0" minHeight="10.0" prefHeight="41.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="116.0" minHeight="10.0" prefHeight="41.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="157.0" minHeight="10.0" prefHeight="157.0" valignment="TOP" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="157.0" minHeight="10.0" prefHeight="157.0" valignment="TOP" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <Label text="Built On:" />
+                  <TextField editable="false" GridPane.columnIndex="1" />
+                  <Label text="Requires Java:" GridPane.rowIndex="1" />
+                  <Label text="Java 5, 6, 7, 8, 9?" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Label text="Likely runs on:" GridPane.rowIndex="2" />
+                  <Label text="WLS, Tomcat?" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <Label text="Likely owned packages:" wrapText="true" GridPane.rowIndex="6" />
+                  <ListView prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                  <Label text="Forward Compatibility Problems:" wrapText="true" GridPane.rowIndex="4" />
+                  <TextFlow prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                     <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Yes (details) or no." />
+                     </children>
+                  </TextFlow>
+                  <Label text="Servlet Spec:" GridPane.rowIndex="3" />
+                  <Label text="Web.xml" GridPane.rowIndex="5" />
+                  <TextArea prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+               </children>
+            </GridPane>
+            <Group>
+               <children>
+                  <Label text="Libraries:" />
+                  <TableView layoutY="17.0" prefHeight="200.0">
+                    <columns>
+                      <TableColumn prefWidth="165.0" text="Library" />
+                      <TableColumn prefWidth="119.0" text="Made by" />
+                    </columns>
+                  </TableView>
+               </children>
+            </Group>
+            <Group>
+               <children>
+                  <TextFlow>
+                     <children>
+                        <Label text="URLs from code." />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text=" (" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="##" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text=") detected." />
+                     </children>
+                  </TextFlow>
+                  <TableView layoutY="17.0" prefHeight="200.0">
+                    <columns>
+                      <TableColumn prefWidth="75.0" text="URL" />
+                      <TableColumn prefWidth="75.0" text="Type" />
+                        <TableColumn prefWidth="75.0" text="Code" />
+                    </columns>
+                  </TableView>
+               </children>
+            </Group>
+         </children>
+      </VBox>
+   </content>
+</ScrollPane>

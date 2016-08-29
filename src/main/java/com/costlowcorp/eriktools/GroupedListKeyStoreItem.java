@@ -39,7 +39,7 @@ public class GroupedListKeyStoreItem {
         this.name=alias;
         this.certificate=certificate;
         this.attributes=CertificateUtilities.getFields(certificate);
-        this.expiration=CertificateUtilities.getExpirationDate(certificate);
+        this.expiration=CertificateUtilities.getExpirationDateAsString(certificate);
         this.algorithm=CertificateUtilities.getAlgorithm(certificate);
         this.signatureAlgorithm=CertificateUtilities.getSignatureAlgorithmTruncated(certificate);
     }

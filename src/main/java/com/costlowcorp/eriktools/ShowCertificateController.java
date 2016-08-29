@@ -98,10 +98,10 @@ public class ShowCertificateController implements Initializable {
         // TODO
     }
 
-    void initilize(Certificate certificate, String alias) {
+    public void initilize(Certificate certificate, String alias) {
         this.alias.textProperty().setValue(alias);
         subject.setText(CertificateUtilities.forWhom(certificate));
-        expirationDate.setText(CertificateUtilities.getExpirationDate(certificate));
+        expirationDate.setText(CertificateUtilities.getExpirationDateAsString(certificate));
         expirationInEnglish.setText("...");
         algorithm.setText(CertificateUtilities.getAlgorithm(certificate));
         signatureAlgorithm.setText(CertificateUtilities.getSignatureAlgorithm(certificate));

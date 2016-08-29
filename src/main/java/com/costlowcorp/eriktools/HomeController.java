@@ -5,7 +5,10 @@
  */
 package com.costlowcorp.eriktools;
 
+import com.costlowcorp.eriktools.about.AboutController;
 import com.costlowcorp.eriktools.checksum.ChecksumFileController;
+import com.costlowcorp.eriktools.jardetails.JarDetailsController;
+import com.costlowcorp.eriktools.jardetails.JarNavigationController;
 import com.costlowcorp.fx.utils.UIUtils;
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,12 +29,16 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 /**
  * FXML Controller class
@@ -72,7 +79,7 @@ public class HomeController implements Initializable {
     public void openChecksum(ActionEvent e) {
         final FXMLLoader loader = UIUtils.load(ChecksumFileController.class);
         final Pane root = loader.getRoot();
-
+        final ChecksumFileController controller = loader.getController();
         final Tab tab = new Tab("Checksum", root);
         tabs.getTabs().add(tab);
     }
@@ -91,29 +98,45 @@ public class HomeController implements Initializable {
         lastFilter = chooser.getSelectedExtensionFilter();
 
         if (check != null) {
+            lastFile = check;
             Node newTabRoot;
             try {
                 final String filename = check.getName().toLowerCase();
                 final int dot = filename.lastIndexOf(".");
                 final String extension = dot > 0 ? filename.substring(dot) : filename;
-                
 
                 switch (extension) {
                     case ".cer":
                     case ".der":
                         newTabRoot = loadCertificatesFrom(check);
                         break;
+                    case ".jar":
+                        newTabRoot = loadJar(check);
+                        break;
                     default:
                         newTabRoot = new Label("Unable to open " + check.getName());
                 }
-                
+
             } catch (CertificateException | IOException ex) {
                 Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
                 newTabRoot = new Label(ex.getMessage() + " :: " + check.getName());
             }
             final Tab newTab = new Tab(check.getName(), newTabRoot);
             tabs.getTabs().add(newTab);
+            tabs.getSelectionModel().select(newTab);
         }
+    }
+
+    public void openAbout(ActionEvent event) {
+        Stage stage = new Stage();
+        final FXMLLoader loader = UIUtils.load(AboutController.class);
+        Parent root = loader.getRoot();
+        stage.setScene(new Scene(root));
+        stage.setTitle("About");
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.initOwner(
+                tabs.getScene().getWindow());
+        stage.show();
     }
 
     private Node loadCertificatesFrom(File file) throws CertificateException, IOException {
@@ -132,6 +155,16 @@ public class HomeController implements Initializable {
         }
 
         return retval;
+    }
+
+    private Node loadJar(File check) {
+        final FXMLLoader loader = UIUtils.load(JarNavigationController.class);
+        //final JarDetailsController controller = loader.getController();
+        //controller.populateWith(check);
+        final JarNavigationController controller = loader.getController();
+        controller.populateWith(check);
+        final Node root = loader.getRoot();
+        return root;
     }
 
 }
