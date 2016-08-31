@@ -35,7 +35,7 @@ public class WarScanner {
     final Set<String> packages = new TreeSet<>();
     int numberOfFiles=0;
 
-    //@Test
+    @Test
     public void testWar() throws IOException {
         System.out.println("TESTING WAR");
         final Path path = Paths.get("C:\\Users\\ecostlow.ORADEV\\Downloads\\Java\\amc2\\JavaAMC-2_4\\webui\\amcwebui.war");
@@ -50,7 +50,7 @@ public class WarScanner {
         packages.forEach(p -> System.out.println("  " + p));
     }
 
-    @Test
+    //@Test
     public void testNestedJar() throws IOException {
         System.out.println("TESTING Nested JAR");
         final Path path = Paths.get("C:\\Users\\ecostlow.ORADEV\\Downloads\\Java\\amc2\\JavaAMC-2_4.ear");

@@ -10,14 +10,11 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
-<?import org.controlsfx.control.TaskProgressView?>
 
-
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.65" fx:controller="com.costlowcorp.eriktools.wardetails.ScanningScreenController">
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.costlowcorp.eriktools.wardetails.ScanningScreenController">
    <children>
       <Button layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#startScan" text="Start" />
-      <TaskProgressView fx:id="taskProgress" layoutX="8.0" layoutY="45.0" prefHeight="213.0" prefWidth="572.0" />
-      <HBox layoutX="14.0" layoutY="258.0">
+      <HBox layoutX="14.0" layoutY="55.0">
          <children>
             <PieChart fx:id="chart" title="File Types" />
             <VBox prefHeight="200.0" prefWidth="100.0">
@@ -31,6 +28,14 @@
                       <TreeTableColumn fx:id="archiveNameCol" prefWidth="156.0" text="Archive" />
                       <TreeTableColumn fx:id="archiveDateCol" prefWidth="94.0" text="Packaged On" />
                         <TreeTableColumn fx:id="archiveOwnershipCol" prefWidth="89.0" text="Ownership" />
+                    </columns>
+                  </TreeTableView>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Identified URLs" />
+                  <TreeTableView fx:id="urlTable" editable="true" prefHeight="200.0" prefWidth="200.0">
+                    <columns>
+                      <TreeTableColumn fx:id="urlCol" prefWidth="120.0" text="URL" />
+                      <TreeTableColumn fx:id="typeCol" prefWidth="100.0" text="Type" />
+                        <TreeTableColumn fx:id="codeCol" prefWidth="119.0" text="Code" />
                     </columns>
                   </TreeTableView>
                </children>

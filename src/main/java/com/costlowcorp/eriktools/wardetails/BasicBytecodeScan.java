@@ -8,6 +8,8 @@ package com.costlowcorp.eriktools.wardetails;
 import com.costlowcorp.eriktools.back.ArchiveWalker;
 import com.costlowcorp.eriktools.back.ArchiveWalkerRecipient;
 import com.costlowcorp.eriktools.jardetails.ClassFileMetaVisitor;
+import com.costlowcorp.eriktools.jardetails.IdentifiedURL;
+import com.costlowcorp.eriktools.jardetails.URLIdentificationVisitor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -33,7 +35,7 @@ import org.objectweb.asm.Opcodes;
  *
  * @author ecostlow
  */
-public class IdentifyOwnedPackagesTask extends Task<Void> {
+public class BasicBytecodeScan extends Task<Void> {
 
     private final Path path;
     private final double maxClasses;
@@ -41,20 +43,25 @@ public class IdentifyOwnedPackagesTask extends Task<Void> {
     private final Set<String> ownedPackages = new TreeSet<>();
     private final Map<String, TreeItem> items = new HashMap<>();
     private TreeItem root;
+    private TreeItem<IdentifiedURL> urlRoot;
     private final Consumer<TreeItem> updateTree;
+    private final Consumer<TreeItem<IdentifiedURL>> urlUpdate;
 
-    public IdentifyOwnedPackagesTask(String title, Path path, long maxClasses, Consumer<Set<String>> onCompletion, Consumer<TreeItem> updateTree) {
+    public BasicBytecodeScan(String title, Path path, long maxClasses, Consumer<Set<String>> onCompletion, Consumer<TreeItem> updateTree, Consumer<TreeItem<IdentifiedURL>> urlUpdate) {
         updateTitle(title);
         this.path = path;
         this.maxClasses = maxClasses;
         this.onCompletion = onCompletion;
         this.updateTree = updateTree;
+        this.urlUpdate=urlUpdate;
     }
 
     @Override
     protected Void call() throws Exception {
         final LongAdder classCount = new LongAdder();
         final Double upMaxClasses = maxClasses;
+        urlRoot = new TreeItem<>(new IdentifiedURL("/", "", "", ""));
+        urlRoot.setExpanded(true);
 
         try (InputStream in = Files.newInputStream(path);
                 ZipInputStream zin = new ZipInputStream(in)) {
@@ -68,7 +75,8 @@ public class IdentifyOwnedPackagesTask extends Task<Void> {
 
                     try {
                         final byte[] bytes = ArchiveWalker.currentEntry(u);
-                        final ClassFileMetaVisitor v = new ClassFileMetaVisitor(Opcodes.ASM5, null);
+                        final URLIdentificationVisitor urlIdentificationVisitor = new URLIdentificationVisitor(Opcodes.ASM5, null);
+                        final ClassFileMetaVisitor v = new ClassFileMetaVisitor(Opcodes.ASM5, urlIdentificationVisitor);
                         final ClassReader reader = new ClassReader(bytes);
                         reader.accept(v, ClassReader.SKIP_CODE);
                         final String pkg = v.getPackage();
@@ -85,8 +93,14 @@ public class IdentifyOwnedPackagesTask extends Task<Void> {
                                 item.getValue().setWhenMade(new Date(entry.getTime()));
                             }
                         }
+                        
+                        if(!urlIdentificationVisitor.getIdentifiedURLs().isEmpty()){
+                            urlIdentificationVisitor.getIdentifiedURLs().stream()
+                                    .map(id -> new TreeItem<>(id))
+                                    .forEach(urlRoot.getChildren()::add);
+                        }
                     } catch (IOException ex) {
-                        Logger.getLogger(IdentifyOwnedPackagesTask.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(BasicBytecodeScan.class.getName()).log(Level.SEVERE, null, ex);
                     }
 
                 }
@@ -105,7 +119,7 @@ public class IdentifyOwnedPackagesTask extends Task<Void> {
         super.succeeded();
         onCompletion.accept(ownedPackages);
         updateTree.accept(root);
-
+        urlUpdate.accept(urlRoot);
     }
 
     private TreeItem nest(Map<String, TreeItem> items, List<String> names) {

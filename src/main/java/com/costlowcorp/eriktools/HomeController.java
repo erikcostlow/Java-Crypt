@@ -9,6 +9,7 @@ import com.costlowcorp.eriktools.about.AboutController;
 import com.costlowcorp.eriktools.checksum.ChecksumFileController;
 import com.costlowcorp.eriktools.jardetails.JarDetailsController;
 import com.costlowcorp.eriktools.jardetails.JarNavigationController;
+import com.costlowcorp.eriktools.wardetails.WarDetailsController;
 import com.costlowcorp.fx.utils.UIUtils;
 import java.io.File;
 import java.io.FileInputStream;
@@ -52,12 +53,14 @@ public class HomeController implements Initializable {
 
     private File lastFile = new File(System.getProperty("user.home"));
 
-    private FileChooser.ExtensionFilter lastFilter = new FileChooser.ExtensionFilter("Anything", "*.jar", "*.cer", "*.der");
+    private FileChooser.ExtensionFilter lastFilter = new FileChooser.ExtensionFilter("Anything", "*.jar", "*.cer", "*.der", "*.war", "*.ear");
 
     private final List<FileChooser.ExtensionFilter> filters = Arrays.asList(
             lastFilter,
             new FileChooser.ExtensionFilter("JARs only", "*.jar"),
-            new FileChooser.ExtensionFilter("KeyStores", "*.jks", "*.pkcs12")
+            new FileChooser.ExtensionFilter("KeyStores", "*.jks", "*.pkcs12"),
+            new FileChooser.ExtensionFilter("Web Applications", "*.war"),
+            new FileChooser.ExtensionFilter("Enterprise Archives", "*.ear")
     );
 
     /**
@@ -113,6 +116,9 @@ public class HomeController implements Initializable {
                     case ".jar":
                         newTabRoot = loadJar(check);
                         break;
+                    case ".war":
+                        newTabRoot = loadWar(check);
+                        break;
                     default:
                         newTabRoot = new Label("Unable to open " + check.getName());
                 }
@@ -163,6 +169,14 @@ public class HomeController implements Initializable {
         //controller.populateWith(check);
         final JarNavigationController controller = loader.getController();
         controller.populateWith(check);
+        final Node root = loader.getRoot();
+        return root;
+    }
+
+    private Node loadWar(File check) {
+        final FXMLLoader loader = UIUtils.load(WarDetailsController.class);
+        final WarDetailsController controller = loader.getController();
+        controller.populateWith(check.toPath());
         final Node root = loader.getRoot();
         return root;
     }
