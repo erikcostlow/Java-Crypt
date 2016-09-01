@@ -10,6 +10,7 @@ import com.costlowcorp.eriktools.checksum.ChecksumFileController;
 import com.costlowcorp.eriktools.jardetails.JarDetailsController;
 import com.costlowcorp.eriktools.jardetails.JarNavigationController;
 import com.costlowcorp.eriktools.wardetails.WarDetailsController;
+import com.costlowcorp.eriktools.wardetails.WarNavigationController;
 import com.costlowcorp.fx.utils.UIUtils;
 import java.io.File;
 import java.io.FileInputStream;
@@ -174,8 +175,8 @@ public class HomeController implements Initializable {
     }
 
     private Node loadWar(File check) {
-        final FXMLLoader loader = UIUtils.load(WarDetailsController.class);
-        final WarDetailsController controller = loader.getController();
+        final FXMLLoader loader = UIUtils.load(WarNavigationController.class);
+        final WarNavigationController controller = loader.getController();
         controller.populateWith(check.toPath());
         final Node root = loader.getRoot();
         return root;

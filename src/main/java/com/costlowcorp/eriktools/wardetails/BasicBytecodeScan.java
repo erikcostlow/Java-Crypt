@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -87,11 +88,15 @@ public class BasicBytecodeScan extends Task<Void> {
                         final List<String> names = new ArrayList<>(t.size());
                         names.addAll(t);
                         names.set(names.size() - 1, pkg);
-                        if (!items.containsKey(makeName(names))) {
-                            final TreeItem<ArchiveOwnershipEntry> item = nest(items, names);
-                            if (entry.getTime() != 0) {
-                                item.getValue().setWhenMade(new Date(entry.getTime()));
-                            }
+                        final String key = makeName(names);
+                        if(items.containsKey(key)){
+                            final TreeItem<ArchiveOwnershipEntry> item = items.get(key);
+                            final FileTime lastModified = entry.getLastModifiedTime()==null ? FileTime.fromMillis(0) : entry.getLastModifiedTime();
+                            item.getValue().setWhenMade(new Date(lastModified.toMillis()));
+                        }else {
+                            final FileTime lastModified = entry.getLastModifiedTime()==null ? FileTime.fromMillis(0) : entry.getLastModifiedTime();
+                            final TreeItem<ArchiveOwnershipEntry> item = nest(items, names, lastModified);
+                            item.getValue().setWhenMade(new Date(lastModified.toMillis()));
                         }
                         
                         if(!urlIdentificationVisitor.getIdentifiedURLs().isEmpty()){
@@ -122,10 +127,11 @@ public class BasicBytecodeScan extends Task<Void> {
         urlUpdate.accept(urlRoot);
     }
 
-    private TreeItem nest(Map<String, TreeItem> items, List<String> names) {
+    private TreeItem nest(Map<String, TreeItem> items, List<String> names, FileTime when) {
         final String currentName = makeName(names);
+        final Date time = when==null ? null : new Date(when.toMillis());
         if (items.isEmpty() && names.size() == 1) {
-            final TreeItem item = new TreeItem(new ArchiveOwnershipEntry(names.get(names.size() - 1), new Date()));
+            final TreeItem item = new TreeItem(new ArchiveOwnershipEntry(names.get(names.size() - 1), time));
             items.put(currentName, item);
             root = item;
             item.setExpanded(true);
@@ -133,10 +139,10 @@ public class BasicBytecodeScan extends Task<Void> {
         } else if (items.containsKey(currentName)) {
             return items.get(currentName);
         } else {
-            final TreeItem item = new TreeItem(new ArchiveOwnershipEntry(names.get(names.size() - 1), new Date()));
+            final TreeItem item = new TreeItem(new ArchiveOwnershipEntry(names.get(names.size() - 1), time));
             item.setExpanded(true);
             final List<String> subList = names.subList(0, names.size() - 1);
-            nest(items, subList).getChildren().add(item);
+            nest(items, subList, when).getChildren().add(item);
             items.put(currentName, item);
             return item;
         }

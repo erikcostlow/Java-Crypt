@@ -39,4 +39,8 @@ public class ArchiveOwnershipEntry {
     MadeBy getOwnership() {
         return madeBy;
     }
+
+    public void setMadeBy(MadeBy madeBy) {
+        this.madeBy = madeBy;
+    }
 }

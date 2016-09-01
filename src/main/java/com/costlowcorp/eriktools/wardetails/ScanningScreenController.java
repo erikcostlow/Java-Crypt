@@ -24,6 +24,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.PieChart;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
@@ -134,7 +135,7 @@ public class ScanningScreenController implements Initializable {
         final Consumer<TreeItem<IdentifiedURL>> urlActor = f -> Platform.runLater(() -> updateUrlTree(f));
 
         final BasicBytecodeScan identifyTask = new BasicBytecodeScan("Identify Programming Frameworks", path, withFolders, afterDone, blah, urlActor);
-        final CountFileIntrospectTypesTask countFileTypes = new CountFileIntrospectTypesTask("Identify files", path, withFolders, chart);
+        final CountFileIntrospectTypesTask countFileTypes = new CountFileIntrospectTypesTask("Identify files", path, withFolders, chart, new Label());
 
         executeTasks(identifyTask, countFileTypes);
     }

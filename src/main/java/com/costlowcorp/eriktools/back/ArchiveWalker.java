@@ -41,7 +41,7 @@ public class ArchiveWalker {
 
     /**
      *
-     * @param name The original filename
+     * @param name The original filename; will be included in your paths.
      * @param zis An opened stream that you will close.
      * @param eachFile What to do on each file, will receive a list of the
      * nested archive and the current stream to read.
@@ -55,6 +55,17 @@ public class ArchiveWalker {
 
     public ArchiveWalker(List<String> names, ZipInputStream zis, ArchiveWalkerRecipient eachFile) {
         this.names = names;
+        this.zis = zis;
+        this.eachFile = eachFile;
+    }
+    
+    /**
+     * For a base archive, to not include its filename.
+     * @param zis
+     * @param eachFile 
+     */
+    public ArchiveWalker(ZipInputStream zis, ArchiveWalkerRecipient eachFile) {
+        this.names = new ArrayList<>(1);
         this.zis = zis;
         this.eachFile = eachFile;
     }

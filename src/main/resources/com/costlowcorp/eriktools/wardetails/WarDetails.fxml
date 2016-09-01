@@ -3,8 +3,6 @@
 <?import javafx.scene.chart.PieChart?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TreeTableColumn?>
@@ -17,6 +15,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.text.TextFlow?>
+
 
 <ScrollPane xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.costlowcorp.eriktools.wardetails.WarDetailsController">
    <content>
@@ -105,15 +104,15 @@
                               <Text strokeType="OUTSIDE" strokeWidth="0.0" text=") detected." />
                            </children>
                         </TextFlow>
-                        <TableView fx:id="urlTable" prefHeight="200.0">
-                          <columns>
-                            <TableColumn fx:id="urlCol" prefWidth="384.0" text="URL" />
-                            <TableColumn fx:id="typeCol" prefWidth="152.0" text="Type" />
-                              <TableColumn fx:id="codeCol" prefWidth="313.0" text="Code" />
-                          </columns>
-                        </TableView>
                      </children>
                   </VBox>
+                  <TreeTableView fx:id="urlTable" editable="true" prefHeight="200.0" prefWidth="200.0">
+                     <columns>
+                        <TreeTableColumn fx:id="urlCol" prefWidth="120.0" text="URL" />
+                        <TreeTableColumn fx:id="typeCol" prefWidth="100.0" text="Type" />
+                        <TreeTableColumn fx:id="codeCol" prefWidth="119.0" text="Code" />
+                     </columns>
+                  </TreeTableView>
                </children>
             </VBox>
          </children>

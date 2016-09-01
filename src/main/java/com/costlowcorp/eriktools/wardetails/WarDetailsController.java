@@ -6,14 +6,27 @@
 package com.costlowcorp.eriktools.wardetails;
 
 import com.costlowcorp.eriktools.App;
+import com.costlowcorp.eriktools.back.ArchiveWalker;
+import com.costlowcorp.eriktools.back.MadeBy;
 import com.costlowcorp.eriktools.jardetails.IdentifiedURL;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.concurrent.Task;
@@ -137,17 +150,49 @@ public class WarDetailsController implements Initializable {
         final Consumer<TreeItem> blah = f -> Platform.runLater(() -> updateTree(f));
         final Consumer<TreeItem<IdentifiedURL>> urlActor = f -> Platform.runLater(() -> updateUrlTree(f));
         final BasicBytecodeScan identifyTask = new BasicBytecodeScan("Identify owned Java packages", path, withFolders, afterDone, blah, urlActor);
-        final CountFileIntrospectTypesTask countFileTypes = new CountFileIntrospectTypesTask("Identify files", path, withFolders, chart);
+        final CountFileIntrospectTypesTask countFileTypes = new CountFileIntrospectTypesTask("Identify files", path, withFolders, chart, requiredJava);
 
         executeTasks(identifyTask, countFileTypes);
+        String runsOn = "Any Java web server";
+        try(InputStream in = Files.newInputStream(path);
+                ZipInputStream zis = new ZipInputStream(in)){
+            FileTime highest=null;
+            for(ZipEntry entry = zis.getNextEntry(); entry!=null; entry = zis.getNextEntry()){
+                final FileTime lastModified = entry.getLastModifiedTime();
+                if(highest==null || (lastModified!=null && lastModified.compareTo(highest)>0)){
+                    highest = entry.getLastModifiedTime();
+                }
+                final String entryName = entry.getName();
+                if("WEB-INF/web.xml".equals(entryName)){
+                    final byte[] bytes = ArchiveWalker.currentEntry(zis);
+                    final String str = new String(bytes);
+                    Platform.runLater(() -> webXml.setText(str));
+                }else if("WEB-INF/weblogic.xml".equals(entryName)){
+                    runsOn = "WebLogic";
+                }else if("WEB-INF/jboss-web.xml".equals(entryName)){
+                    runsOn = "JBoss";
+                }
+            }
+            final FileTime t = highest;
+            final String runText = runsOn;
+            Platform.runLater(() -> {
+                builtOn.setText(String.valueOf(t));
+                container.setText(runText);
+            });
+        } catch (IOException ex) {
+            Logger.getLogger(WarDetailsController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     private void updateOwnedPackages(Set<String> packages) {
         ownedPackages.setText(String.join("\n", packages));
     }
 
-    private void updateTree(TreeItem root) {
+    private void updateTree(TreeItem<ArchiveOwnershipEntry> root) {
         archiveTable.setRoot(root);
+        updateOwnership();
+        
+       
     }
     
     private void updateUrlTree(TreeItem<IdentifiedURL> root) {
@@ -156,5 +201,31 @@ public class WarDetailsController implements Initializable {
     
     private void executeTasks(Task... tasks) {
         Arrays.stream(tasks).forEach(task -> App.submit(task));
+    }
+
+    private void updateOwnership() {
+        final Set<String> ownedPackageNames = new HashSet<>();
+        final String[] split = ownedPackages.getText().split("\n");
+        Arrays.stream(split).forEach(ownedPackageNames::add);
+        update(ownedPackageNames, archiveTable.getRoot());
+    }
+    
+    private MadeBy update(Set<String> ownedPackageNames, TreeItem<ArchiveOwnershipEntry> item){
+        MadeBy temp = MadeBy.THIRD_PARTY;
+        if(!item.getChildren().isEmpty()){
+             final Set<MadeBy> checkers =item.getChildren().stream().map(child -> update(ownedPackageNames, child)).filter(madeBy -> !madeBy.equals(MadeBy.THIRD_PARTY)).collect(Collectors.toSet());
+             if(checkers.contains(MadeBy.BOTH)){
+                 temp = MadeBy.BOTH;
+             }else if(checkers.contains(MadeBy.SELF)){
+                 temp = MadeBy.SELF;
+             }
+        }
+        final String name = item.getValue().getName();
+        final Optional<String> checkIfSelf = ownedPackageNames.stream().filter(pkg -> name.startsWith(pkg)).findAny();
+        final MadeBy current = checkIfSelf.isPresent() || temp==MadeBy.SELF ? MadeBy.SELF : temp;
+        
+        checkIfSelf.ifPresent(str -> item.getValue().setMadeBy(current));
+        
+        return current;
     }
 }

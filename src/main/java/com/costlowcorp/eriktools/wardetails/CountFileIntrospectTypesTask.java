@@ -8,22 +8,23 @@ package com.costlowcorp.eriktools.wardetails;
 import com.costlowcorp.eriktools.ErikUtils;
 import com.costlowcorp.eriktools.back.ArchiveWalker;
 import com.costlowcorp.eriktools.back.ArchiveWalkerRecipient;
+import com.costlowcorp.eriktools.back.ClassFileUtils;
 import com.costlowcorp.eriktools.jardetails.ClassFileMetaVisitor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.DoubleAdder;
-import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipInputStream;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.chart.PieChart;
+import javafx.scene.control.Label;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import org.objectweb.asm.ClassReader;
 
@@ -32,25 +33,27 @@ import org.objectweb.asm.ClassReader;
  * @author ecostlow
  */
 public class CountFileIntrospectTypesTask extends Task<Void> {
-
+    
     private final Path path;
     private final double totalFiles;
     private final PieChart chart;
+    private final Label minJava;
     private final Map<String, Double> chartData;
-
-    public CountFileIntrospectTypesTask(String title, Path path, long totalFiles, PieChart chart) {
+    
+    public CountFileIntrospectTypesTask(String title, Path path, long totalFiles, PieChart chart, Label minJava) {
         updateTitle(title);
         this.path = path;
         this.totalFiles = totalFiles;
         this.chart = chart;
+        this.minJava = minJava;
         chartData = new HashMap<>();
         chart.getData().forEach(data -> chartData.put(data.getName(), data.getPieValue()));
     }
-
+    
     @Override
     protected Void call() throws Exception {
         final DoubleAdder fileCount = new DoubleAdder();
-
+        
         try (InputStream in = Files.newInputStream(path);
                 ZipInputStream zin = new ZipInputStream(in)) {
             final Double upTotalFiles = totalFiles;
@@ -62,7 +65,7 @@ public class CountFileIntrospectTypesTask extends Task<Void> {
                 updateMessage(message);
                 updateProgress(currentClass, totalFiles);
                 final String justFilename = t.get(t.size() - 1);
-                if(entry.isDirectory()){
+                if (entry.isDirectory()) {
                     return;
                 }
                 final String extension = ErikUtils.getExtension(justFilename);
@@ -91,40 +94,47 @@ public class CountFileIntrospectTypesTask extends Task<Void> {
         } catch (IOException ex) {
             Logger.getLogger(WarDetailsController.class.getName()).log(Level.SEVERE, "The task failed", ex);
         }
-
+        
         return null;
     }
-
+    
     @Override
     protected void failed() {
         super.failed();
         System.out.println("Failed count file");
     }
-
+    
     @Override
     protected void cancelled() {
         super.cancelled();
         System.out.println("Cancelled count file");
     }
-
+    
     @Override
     protected void succeeded() {
         super.succeeded();
         updateChart();
     }
-
+    
     private void updateChart() {
         final Map<String, PieChart.Data> pieData = new HashMap<>();
         chart.getData().forEach(data -> pieData.put(data.getName(), data));
+        
+        final Optional<String> javaVer = chartData.keySet().stream()
+                .filter(name -> name.contains("Java"))
+                .max((a, b) -> ClassFileUtils.latestVersion(a, b));
         Platform.runLater(()
-                -> chartData.forEach((key, value) -> {
-                    if (pieData.containsKey(key)) {
-                        pieData.get(key).setPieValue(value);
-                    } else {
-                        final PieChart.Data data = new PieChart.Data(key, value);
-                        chart.getData().add(data);
-                    }
-                }));
+                -> {
+            javaVer.ifPresent(str -> minJava.setText(str));
+            chartData.forEach((key, value) -> {
+                if (pieData.containsKey(key)) {
+                    pieData.get(key).setPieValue(value);
+                } else {
+                    final PieChart.Data data = new PieChart.Data(key, value);
+                    chart.getData().add(data);
+                }
+            });
+        });
     }
-
+    
 }
