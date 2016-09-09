@@ -5,7 +5,6 @@
  */
 package com.costlowcorp.eriktools;
 
-import com.sun.istack.internal.logging.Logger;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -18,7 +17,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.function.BiConsumer;
+import java.util.logging.Logger;
 
 /**
  *
@@ -133,7 +132,7 @@ enum ErikThreadExecutor implements ExecutorService {
                     whenNoJobsLeft.run();
                 }
             } catch (RuntimeException e) {
-                Logger.getLogger(ErikThreadExecutor.class).info("Index error looking at completed jobs", e);
+                Logger.getLogger(ErikThreadExecutor.class.getSimpleName()).info("Index error looking at completed jobs: " + e.getMessage());
             }
         }
 

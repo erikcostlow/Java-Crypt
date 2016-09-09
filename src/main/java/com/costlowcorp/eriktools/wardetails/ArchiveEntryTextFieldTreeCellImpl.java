@@ -5,8 +5,12 @@
  */
 package com.costlowcorp.eriktools.wardetails;
 
+import com.costlowcorp.fx.utils.ImageGrabber;
+import javafx.scene.Node;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeCell;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
@@ -54,8 +58,22 @@ public class ArchiveEntryTextFieldTreeCellImpl extends TreeCell<ArchiveEntryTree
             setText(null);
             setGraphic(textField);
         } else {
-            setText(getString());
-            setGraphic(getTreeItem().getGraphic());
+            final String s = getString();
+            setText(s);
+            Node node = getTreeItem().getGraphic();
+            if(node==null){
+                final Image img = ImageGrabber.imageFor(s);
+                if(img!=null){
+                    final ImageView temp = new ImageView(img);
+                    temp.setFitHeight(16);
+                    temp.setFitWidth(16);
+                    node = temp;
+                    setGraphic(node);
+                }
+            }
+            
+            
+            setGraphic(node);
         }
     }
 

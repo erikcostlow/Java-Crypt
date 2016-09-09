@@ -25,13 +25,17 @@ import javafx.scene.control.TreeView;
  * @author ecostlow
  */
 public class PopulateArchiveTreeTask extends Task<Void> {
+    
+    public static final String ARCHIVE_SPLIT_STR = "->";
 
     private final InputStreamMaker maker;
     private TreeItem<ArchiveEntryTreeViewer> root = new TreeItem<>();
     private final Map<String, TreeItem<ArchiveEntryTreeViewer>> map = new HashMap<>();
     private final TreeView populateMe;
 
-    public PopulateArchiveTreeTask(InputStreamMaker maker, TreeView populateMe) {
+    public PopulateArchiveTreeTask(String name, InputStreamMaker maker, TreeView populateMe) {
+        root.setValue(new ArchiveEntryTreeViewer(name));
+        //root.getValue().forceShowName(name);
         this.maker = maker;
         this.populateMe = populateMe;
     }
@@ -71,7 +75,7 @@ public class PopulateArchiveTreeTask extends Task<Void> {
         if(names.isEmpty()){
             return root;
         }
-        final String joined = String.join("->", names);
+        final String joined = String.join(ARCHIVE_SPLIT_STR, names);
         if(map.containsKey(joined)){
             return map.get(joined);
         }

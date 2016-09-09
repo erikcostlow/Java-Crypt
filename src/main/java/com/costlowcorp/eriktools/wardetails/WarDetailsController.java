@@ -200,7 +200,7 @@ public class WarDetailsController implements Initializable {
     }
     
     private void executeTasks(Task... tasks) {
-        Arrays.stream(tasks).forEach(task -> App.submit(task));
+        Arrays.stream(tasks).forEach(task -> App.submitVisible(task));
     }
 
     private void updateOwnership() {

@@ -141,7 +141,7 @@ public class ScanningScreenController implements Initializable {
     }
 
     private void executeTasks(Task... tasks) {
-        Arrays.stream(tasks).forEach(task -> App.submit(task));
+        Arrays.stream(tasks).forEach(task -> App.submitVisible(task));
     }
 
     private void updateOwnedPackages(Set<String> packages) {

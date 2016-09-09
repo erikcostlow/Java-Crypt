@@ -54,8 +54,8 @@ public class WarNavigationController implements Initializable {
         new Thread(() -> prepDetailsNode()).start();
         final InputStreamMaker maker = () -> Files.newInputStream(path);
 
-        final PopulateArchiveTreeTask task = new PopulateArchiveTreeTask(maker, fileNavigation);
-        App.submit(task);
+        final PopulateArchiveTreeTask task = new PopulateArchiveTreeTask(String.valueOf(path.getFileName()), maker, fileNavigation);
+        App.submitVisible(task);
 
     }
 

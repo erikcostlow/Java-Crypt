@@ -49,7 +49,7 @@ public class ArchiveWalkerTest {
                     System.out.print("Class File: " + String.join("->", t));
                     final ClassFileMetaVisitor v = new ClassFileMetaVisitor(Opcodes.ASM5, null);
                     try {
-                        final byte[] bytes = ArchiveWalker.currentEntry(zin);
+                        final byte[] bytes = ArchiveWalker.currentEntry(u);
                         final ClassReader reader = new ClassReader(bytes);
                         reader.accept(v, ClassReader.SKIP_CODE);
                         final String packageName = v.getName().contains("/") ? v.getName().substring(0, v.getName().lastIndexOf('/')) : "EmptyPackage";

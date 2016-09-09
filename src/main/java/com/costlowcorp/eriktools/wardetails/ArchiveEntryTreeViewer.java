@@ -29,7 +29,16 @@ public class ArchiveEntryTreeViewer {
     }
     
     private void changeShowName(){
-        showName.set(ErikUtils.justFilename(actualFile.get()));
+        final String actualFilename = actualFile.get();
+        final String strCheck = PopulateArchiveTreeTask.ARCHIVE_SPLIT_STR;
+        final int splitIndex = actualFilename.indexOf(strCheck);
+        final String retval;
+        if(splitIndex>0){
+            retval = ErikUtils.justFilename(actualFilename.substring(splitIndex+strCheck.length()));
+        }else{
+            retval = ErikUtils.justFilename(actualFile.get());
+        }
+        showName.set(retval);
     }
     
     public StringProperty actualFileProperty(){
@@ -38,5 +47,9 @@ public class ArchiveEntryTreeViewer {
     
     public StringProperty showNameProperty(){
         return showName;
+    }
+    
+    public void forceShowName(String name){
+        showName.set(name);
     }
 }

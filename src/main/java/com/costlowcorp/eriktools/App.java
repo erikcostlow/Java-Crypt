@@ -6,10 +6,7 @@
 package com.costlowcorp.eriktools;
 
 import com.costlowcorp.eriktools.code.CodeEditor;
-import com.costlowcorp.eriktools.wardetails.ScanningScreenController;
 import com.costlowcorp.fx.utils.UIUtils;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -78,7 +75,7 @@ public class App extends Application {
         launch(args);
     }
 
-    public static final void submit(Task task) {
+    public static final void submitVisible(Task task) {
         Platform.runLater(() -> {
             if(!masterDetail.isShowDetailNode()){
                 masterDetail.setShowDetailNode(true);
@@ -86,5 +83,9 @@ public class App extends Application {
             taskView.getTasks().add(task);
             EXECUTOR.submit(task);
         });
+    }
+    
+    public static final void submitInvisible(Task task) {
+        EXECUTOR.submit(task);
     }
 }

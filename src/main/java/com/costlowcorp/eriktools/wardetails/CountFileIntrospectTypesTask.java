@@ -25,8 +25,8 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Label;
-import jdk.internal.org.objectweb.asm.Opcodes;
 import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Opcodes;
 
 /**
  *
