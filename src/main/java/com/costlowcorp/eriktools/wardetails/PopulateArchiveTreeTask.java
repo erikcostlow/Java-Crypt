@@ -70,8 +70,34 @@ public class PopulateArchiveTreeTask extends Task<Void> {
         super.succeeded();
         Platform.runLater(() -> populateMe.setRoot(root));
     }
-
+    
     private TreeItem<ArchiveEntryTreeViewer> nest(List<String> names) {
+        if(names.isEmpty()){
+            return root;
+        }
+        final String joined = String.join(ARCHIVE_SPLIT_STR, names);
+        if(map.containsKey(joined)){
+            return map.get(joined);
+        }
+        final TreeItem<ArchiveEntryTreeViewer> item = new TreeItem<>(new ArchiveEntryTreeViewer(joined));
+        map.put(joined, item);
+        final String currentName = names.get(names.size()-1);
+        int lastSlashNonCurrent = currentName.lastIndexOf('/', currentName.length()-2);
+        final List subList;
+        if(lastSlashNonCurrent<=1){
+            subList = names.subList(0, names.size()-1);
+        }
+        else{
+            subList = new ArrayList<>(names);
+            final String subName = currentName.substring(0, lastSlashNonCurrent+1);
+            subList.set(subList.size()-1, subName);
+        }
+        
+        oldnest(subList).getChildren().add(item);
+        return item;
+    }
+
+    private TreeItem<ArchiveEntryTreeViewer> oldnest(List<String> names) {
         if(names.isEmpty()){
             return root;
         }
@@ -91,10 +117,12 @@ public class PopulateArchiveTreeTask extends Task<Void> {
             subList = names.subList(0, names.size()-1);
         }else{
             subList = new ArrayList<>(names);
-            subList.set(subList.size()-1, currentName.substring(0, lastSlash));
+            final String subName = currentName.substring(0, lastSlash+1);
+            System.out.println("subName is " + subName + " from " + currentName);
+            subList.set(subList.size()-1, subName);
         }
         
-        nest(subList).getChildren().add(item);
+        oldnest(subList).getChildren().add(item);
         return item;
     }
     

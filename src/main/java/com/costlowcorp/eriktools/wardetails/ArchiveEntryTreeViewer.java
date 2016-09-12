@@ -33,6 +33,7 @@ public class ArchiveEntryTreeViewer {
         final String strCheck = PopulateArchiveTreeTask.ARCHIVE_SPLIT_STR;
         final int splitIndex = actualFilename.indexOf(strCheck);
         final String retval;
+        //Utility trims off the folder's / for display
         if(splitIndex>0){
             retval = ErikUtils.justFilename(actualFilename.substring(splitIndex+strCheck.length()));
         }else{

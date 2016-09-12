@@ -25,6 +25,8 @@ import java.util.logging.Logger;
  */
 enum ErikThreadExecutor implements ExecutorService {
     INSTANCE;
+    
+    private static final Logger LOG = Logger.getLogger(ErikThreadExecutor.class.getSimpleName());
 
     private final ErikThreadPool actualService = new ErikThreadPool(0, Integer.MAX_VALUE,
             60L, TimeUnit.SECONDS,
@@ -124,6 +126,9 @@ enum ErikThreadExecutor implements ExecutorService {
         @Override
         protected void afterExecute(Runnable r, Throwable t) {
             super.afterExecute(r, t);
+            if(t!=null){
+                LOG.info(t.getMessage());
+            }
             final int activeCount = getActiveCount();
             //System.out.println("Done with job and now have " + activeCount + " jobs");
             try {
