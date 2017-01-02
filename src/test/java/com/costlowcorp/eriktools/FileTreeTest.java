@@ -43,7 +43,7 @@ public class FileTreeTest extends Application {
     public void start(Stage stage) throws Exception {
         VBox root = new VBox();
         root.getChildren().add(new Label("BLah"));
-        final String file = "C:\\Users\\ecostlow.ORADEV\\Downloads\\temp\\CryptoUI-1.0-SNAPSHOT.jar";
+        final String file = "C:\\Users\\erikc_000\\Downloads\\temp\\CryptoUI-1.0-SNAPSHOT.jar";
         try (ZipFile zip = new ZipFile(file)) {
             root.getChildren().add(treeFromZip(zip));
         }

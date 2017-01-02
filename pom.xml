@@ -12,12 +12,12 @@
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
     
-    <repositories>
+    <!--repositories>
         <repository>
             <id>JensDeters</id>
             <url>https://dl.bintray.com/jerady/maven/</url>
         </repository>
-    </repositories>
+    </repositories-->
     
     <dependencies>
         <dependency>
@@ -30,11 +30,11 @@
             <artifactId>asm-all</artifactId>
             <version>5.1</version>
         </dependency>
-        <dependency>
+        <!--dependency>
             <groupId>de.jensd</groupId>
             <artifactId>fontawesomefx-controls</artifactId>
             <version>8.12</version>
-        </dependency>
+        </dependency-->
         <dependency>
             <groupId>org.fxmisc.richtext</groupId>
             <artifactId>richtextfx</artifactId>
@@ -48,7 +48,17 @@
         <dependency>
             <groupId>org.benf</groupId>
             <artifactId>cfr</artifactId>
-            <version>0.117</version>
+            <version>0.119</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jgrapht</groupId>
+            <artifactId>jgrapht-core</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.gephi</groupId>
+            <artifactId>gephi-toolkit</artifactId>
+            <version>0.9.1</version>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
@@ -60,6 +70,11 @@
             <groupId>org.openjdk.jol</groupId>
             <artifactId>jol-core</artifactId>
             <version>0.5</version>
+        </dependency>
+        <dependency>
+            <groupId>com.airhacks</groupId>
+            <artifactId>afterburner.fx</artifactId>
+            <version>1.7.0</version>
         </dependency>
     </dependencies>
     
@@ -75,6 +90,25 @@
                         </manifestEntries>
                     </archive>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.4.3</version>
+                <goals>
+                    <goal>release</goal>
+                </goals>
+                <configuration>
+                    <finalName>ErikTools</finalName>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

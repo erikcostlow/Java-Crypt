@@ -7,6 +7,7 @@ package com.costlowcorp.eriktools;
 
 import com.costlowcorp.eriktools.about.AboutController;
 import com.costlowcorp.eriktools.checksum.ChecksumFileController;
+import com.costlowcorp.eriktools.eardetails.EarNavigationController;
 import com.costlowcorp.eriktools.jardetails.JarDetailsController;
 import com.costlowcorp.eriktools.jardetails.JarNavigationController;
 import com.costlowcorp.eriktools.wardetails.WarDetailsController;
@@ -120,6 +121,9 @@ public class HomeController implements Initializable {
                     case ".war":
                         newTabRoot = loadWar(check);
                         break;
+                    case ".ear":
+                        newTabRoot = loadEar(check);
+                        break;
                     default:
                         newTabRoot = new Label("Unable to open " + check.getName());
                 }
@@ -181,5 +185,12 @@ public class HomeController implements Initializable {
         final Node root = loader.getRoot();
         return root;
     }
-
+    
+    private Node loadEar(File check) {
+        final FXMLLoader loader = UIUtils.load(EarNavigationController.class);
+        final EarNavigationController controller = loader.getController();
+        controller.populateWith(check.toPath());
+        final Node root = loader.getRoot();
+        return root;
+    }
 }

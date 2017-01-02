@@ -115,8 +115,7 @@ public class ScanningScreenController implements Initializable {
     }
 
     public void startScan(ActionEvent event) {
-        path = Paths.get("C:\\Users\\ecostlow.ORADEV\\Downloads\\Java\\amc2\\JavaAMC-2_4.ear");
-//        path = Paths.get("C:\\Users\\ecostlow.ORADEV\\Downloads\\Java\\amc2\\JavaAMC-2_4\\webui\\amcwebui.war");
+        path = Paths.get("C:\\Apps\\thing.ear");
         populateWith(path);
     }
 

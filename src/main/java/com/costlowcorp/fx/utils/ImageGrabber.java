@@ -41,7 +41,7 @@ public class ImageGrabber {
         switch(extension){
             case "class":
             case "java":
-                retval = retrieve("javaClass.gif");
+                retval = retrieve("java.png");
                 break;
             case "properties":
             case "mf":
@@ -70,6 +70,9 @@ public class ImageGrabber {
             case "jpg":
             case "jpeg":
                 retval = retrieve("image.png");
+                break;
+            case "jnlp":
+                retval = retrieve("duke.png");
                 break;
             default:
                 retval=null;

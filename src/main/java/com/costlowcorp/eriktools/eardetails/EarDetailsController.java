@@ -3,14 +3,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.costlowcorp.eriktools.wardetails;
+package com.costlowcorp.eriktools.eardetails;
 
 import com.costlowcorp.eriktools.App;
 import com.costlowcorp.eriktools.back.ArchiveWalker;
 import com.costlowcorp.eriktools.back.MadeBy;
 import com.costlowcorp.eriktools.jardetails.IdentifiedURL;
-import com.costlowcorp.eriktools.scanners.BuildHierarchyTask;
-import com.costlowcorp.fx.utils.DateApproximator;
+import com.costlowcorp.eriktools.wardetails.ArchiveEntryTreeViewer;
+import com.costlowcorp.eriktools.wardetails.ArchiveOwnershipEntry;
+import com.costlowcorp.eriktools.wardetails.BasicBytecodeScan;
+import com.costlowcorp.eriktools.wardetails.CountFileIntrospectTypesTask;
+import com.costlowcorp.eriktools.wardetails.SimpleFileCountTask;
+import com.costlowcorp.eriktools.wardetails.WarDetailsController;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -18,9 +22,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;
@@ -35,8 +36,6 @@ import java.util.zip.ZipInputStream;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.PieChart;
@@ -46,15 +45,16 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
+import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.TextFieldTreeTableCell;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 
 /**
  * FXML Controller class
  *
  * @author ecostlow
  */
-public class WarDetailsController implements Initializable {
+public class EarDetailsController implements Initializable {
     
     private Path path;
     
@@ -184,20 +184,11 @@ public class WarDetailsController implements Initializable {
             final FileTime t = highest;
             final String runText = runsOn;
             Platform.runLater(() -> {
-                final String builtDate = String.valueOf(t);
-                final String builtDateEnglish = DateApproximator.between(LocalDateTime.ofInstant(t.toInstant(), ZoneId.systemDefault()), LocalDateTime.now()) + " ago.";
-                builtOn.setText(builtDateEnglish);
-                builtOn.setOnMouseClicked((MouseEvent event) -> {
-                    if(builtOn.getText().equals(builtDateEnglish)){
-                        builtOn.setText(builtDate);
-                    }else{
-                        builtOn.setText(builtDateEnglish);
-                    }
-                });
+                builtOn.setText(String.valueOf(t));
                 container.setText(runText);
             });
         } catch (IOException ex) {
-            Logger.getLogger(WarDetailsController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(EarDetailsController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -208,8 +199,7 @@ public class WarDetailsController implements Initializable {
     private void updateTree(TreeItem<ArchiveOwnershipEntry> root) {
         archiveTable.setRoot(root);
         updateOwnership();
-        
-       
+        collapse(root);
     }
     
     private void updateUrlTree(TreeItem<IdentifiedURL> root) {
@@ -245,24 +235,13 @@ public class WarDetailsController implements Initializable {
         
         return current;
     }
-    
-    public void outputHierarchy(ActionEvent e){
-        //Ask for otuput file
-        //Open all JAR files
-        //For each class:
-        //1. GetOrCreate a node. ID should be classname
-            //Attribute: archive
-            //Attribute: havebytecode
-        //2. GetOrCreate node of superclass and all interfaces
-            //If create, havebytecode should be false, archive should be null
-        //3. Walk through methods
-            //Same for method annotation classes
-        //Output gexf
-        final BuildHierarchyTask task = new BuildHierarchyTask(path);
-        App.submitVisible(task);
+
+    private boolean collapse(TreeItem<ArchiveOwnershipEntry> item) {
+        if(item.getChildren().isEmpty()){
+            return false;
+        }
+        item.setExpanded(item.getChildren().stream().map(c -> collapse(c)).filter(b -> b).count()>0);
+        return true;
     }
-    
-    public void outputControlFlow(ActionEvent e){
-        
-    }
+
 }

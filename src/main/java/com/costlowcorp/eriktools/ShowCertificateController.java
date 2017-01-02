@@ -102,9 +102,14 @@ public class ShowCertificateController implements Initializable {
         this.alias.textProperty().setValue(alias);
         subject.setText(CertificateUtilities.forWhom(certificate));
         expirationDate.setText(CertificateUtilities.getExpirationDateAsString(certificate));
-        expirationInEnglish.setText("...");
+        expirationInEnglish.setText("[InEnglish]");
         algorithm.setText(CertificateUtilities.getAlgorithm(certificate));
         signatureAlgorithm.setText(CertificateUtilities.getSignatureAlgorithm(certificate));
+        final Map<String, String> fields = CertificateUtilities.getFields(certificate);
+        commonName.setText(fields.getOrDefault("CN", "Unknown"));
+        organization.setText(fields.getOrDefault("O", "Unknown"));
+        locality.setText(fields.getOrDefault("L", "Unknown"));
+        country.setText(fields.getOrDefault("C", "Unknown"));
         
         sha256.setText(CertificateUtilities.sha256(certificate));
         final X509Certificate x509 = (X509Certificate) certificate;

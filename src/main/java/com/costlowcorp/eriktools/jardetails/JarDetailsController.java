@@ -308,7 +308,18 @@ public class JarDetailsController implements Initializable {
                     FXMLLoader ldr = UIUtils.load(CertificatePathController.class);
                     final CertificatePathController ctrl = ldr.getController();
                     ctrl.initialize(path);
+                    if(first.getTimestamp()!=null){
+                        ctrl.initialize(first.getTimestamp().getSignerCertPath());
+                    }
+                    while(iter.hasNext()){
+                        CodeSigner signer = iter.next();
+                        ctrl.initialize(signer.getSignerCertPath());
+                        if(signer.getTimestamp()!=null){
+                            ctrl.initialize(signer.getTimestamp().getSignerCertPath());
+                        }
+                    }
                     newNode = ldr.getRoot();
+                    UIUtils.setAnchors(newNode, 0, 0, 0, 0);
                 } else {
                     newNode = languageChart;
                 }

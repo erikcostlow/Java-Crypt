@@ -36,7 +36,7 @@ public class ArchiveOwnershipEntry {
         this.whenMade=date;
     }
 
-    MadeBy getOwnership() {
+    public MadeBy getOwnership() {
         return madeBy;
     }
 

@@ -70,11 +70,12 @@ public class CertificatePathController implements Initializable {
             }
             
         });
+        final TreeItem<Certificate> root = new TreeItem<>();
+        certPathTree.setRoot(root);
     }
     
     public void initialize(CertPath path){
-        final TreeItem<Certificate> root = new TreeItem<>();
-        certPathTree.setRoot(root);
+        
         TreeItem current=null;
         for(Certificate cert : path.getCertificates()){
             final TreeItem<Certificate> item = convert(cert);

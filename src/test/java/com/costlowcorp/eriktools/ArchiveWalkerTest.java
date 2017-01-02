@@ -35,10 +35,11 @@ public class ArchiveWalkerTest {
 
     @Test
     public void testWalkWar() throws IOException {
-        final String war = "C:\\Users\\ecostlow.ORADEV\\Downloads\\Java\\amc2\\JavaAMC-2_4.ear";
+        final String war = "C:\\apps\\thing.ear";
         final Path path = Paths.get(war);
         final LongAdder fileCount = new LongAdder();
         final Set<String> ownedPackages = new TreeSet<>();
+        final StringBuilder sb = new StringBuilder();
         try (InputStream in = Files.newInputStream(path);
                 ZipInputStream zin = new ZipInputStream(in)) {
 
@@ -46,24 +47,25 @@ public class ArchiveWalkerTest {
                 fileCount.increment();
                 final String lastName = t.get(t.size() - 1);
                 if (lastName.endsWith(".class")) {
-                    System.out.print("Class File: " + String.join("->", t));
+                    sb.append("Class File: " + String.join("->", t) + "\n");
                     final ClassFileMetaVisitor v = new ClassFileMetaVisitor(Opcodes.ASM5, null);
                     try {
                         final byte[] bytes = ArchiveWalker.currentEntry(u);
                         final ClassReader reader = new ClassReader(bytes);
                         reader.accept(v, ClassReader.SKIP_CODE);
                         final String packageName = v.getName().contains("/") ? v.getName().substring(0, v.getName().lastIndexOf('/')) : "EmptyPackage";
-                        System.out.print(" JAVA " + v.getJava() + " PKG " + packageName);
+                        sb.append(" JAVA " + v.getJava() + " PKG " + packageName + "\n");
                     } catch (IOException ex) {
                         Logger.getLogger(ArchiveWalkerTest.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    System.out.println();
+                    //System.out.println();
                 }
             };
             final ArchiveWalker walker = new ArchiveWalker(war, zin, eachFile);
             
             walker.walk();
         }
+        System.out.println(sb.toString());
         System.out.println("There are " + fileCount.longValue() + " files.");
     }
 }

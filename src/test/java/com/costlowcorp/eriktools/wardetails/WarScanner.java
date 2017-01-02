@@ -38,7 +38,7 @@ public class WarScanner {
     @Test
     public void testWar() throws IOException {
         System.out.println("TESTING WAR");
-        final Path path = Paths.get("C:\\Users\\ecostlow.ORADEV\\Downloads\\Java\\amc2\\JavaAMC-2_4\\webui\\amcwebui.war");
+        final Path path = Paths.get("c:\\Apps\\thing.war");
         try (InputStream in = Files.newInputStream(path);
                 ZipInputStream zis = new ZipInputStream(in)) {
             for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
@@ -53,7 +53,7 @@ public class WarScanner {
     //@Test
     public void testNestedJar() throws IOException {
         System.out.println("TESTING Nested JAR");
-        final Path path = Paths.get("C:\\Users\\ecostlow.ORADEV\\Downloads\\Java\\amc2\\JavaAMC-2_4.ear");
+        final Path path = Paths.get("c:\\Apps\\thing.ear");
         try (InputStream in = Files.newInputStream(path);
                 ZipInputStream zis = new ZipInputStream(in)) {
             for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {

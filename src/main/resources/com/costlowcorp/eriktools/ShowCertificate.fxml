@@ -75,11 +75,11 @@
             </TextFlow>
             </children>
         </GridPane>
-        <FlowPane prefWidth="200.0" styleClass="indented">
+        <!--FlowPane prefWidth="200.0" styleClass="indented">
             <children>
                 <Button id="details" mnemonicParsing="false" onAction="#showDetails" text="Details" />
                 <Button id="export" mnemonicParsing="false" onAction="#export" text="Export" />
             </children>
-        </FlowPane>
+        </FlowPane-->
     </children>
 </VBox>

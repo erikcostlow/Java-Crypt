@@ -75,7 +75,7 @@ public class App extends Application {
         launch(args);
     }
 
-    public static final void submitVisible(Task task) {
+    public static final void submitVisible(Task<?> task) {
         Platform.runLater(() -> {
             if(!masterDetail.isShowDetailNode()){
                 masterDetail.setShowDetailNode(true);

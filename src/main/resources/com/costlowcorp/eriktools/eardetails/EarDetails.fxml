@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.chart.PieChart?>
-<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
@@ -17,50 +16,43 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.text.TextFlow?>
 
-<ScrollPane xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.costlowcorp.eriktools.wardetails.WarDetailsController">
+
+<ScrollPane xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.costlowcorp.eriktools.eardetails.EarDetailsController">
    <content>
       <VBox>
          <children>
-            <TextFlow prefWidth="200.0">
+            <TextFlow>
                <children>
-                  <Label fx:id="filename" text="Filename.war" />
+                  <Label fx:id="filename" text="Filename.ear" />
                   <Label text=" - " />
-                  <Label text="W">
+                  <Label text="E">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </Label>
-                  <Label text="eb " />
-                  <Label text="A">
-                     <font>
-                        <Font name="System Bold" size="12.0" />
-                     </font>
-                  </Label>
+                  <Label text="nterprise " />
+                  <Label text="A" />
                   <Label text="pplication A" />
-                  <Label text="R">
-                     <font>
-                        <Font name="System Bold" size="12.0" />
-                     </font>
-                  </Label>
+                  <Label text="R" />
                   <Label text="chive" />
                </children>
             </TextFlow>
             <HBox>
                <children>
                   <GridPane>
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints maxHeight="33.0" minHeight="10.0" prefHeight="22.0" vgrow="SOMETIMES" />
-                      <RowConstraints maxHeight="54.0" minHeight="10.0" prefHeight="26.0" vgrow="SOMETIMES" />
-                      <RowConstraints maxHeight="92.0" minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints maxHeight="33.0" minHeight="10.0" prefHeight="22.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="54.0" minHeight="10.0" prefHeight="26.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="92.0" minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
                         <RowConstraints maxHeight="116.0" minHeight="10.0" prefHeight="41.0" vgrow="SOMETIMES" />
                         <RowConstraints maxHeight="116.0" minHeight="10.0" prefHeight="41.0" vgrow="SOMETIMES" />
                         <RowConstraints maxHeight="157.0" minHeight="10.0" prefHeight="157.0" valignment="TOP" vgrow="SOMETIMES" />
                         <RowConstraints maxHeight="157.0" minHeight="10.0" prefHeight="157.0" valignment="TOP" vgrow="SOMETIMES" />
-                    </rowConstraints>
+                     </rowConstraints>
                      <children>
                         <Label text="Built On:" />
                         <TextField fx:id="builtOn" editable="false" GridPane.columnIndex="1" />
@@ -81,28 +73,18 @@
                         <TextArea fx:id="ownedPackages" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                      </children>
                   </GridPane>
-                  <VBox>
-                     <children>
-                        <PieChart fx:id="chart" title="File Contents" />
-                        <HBox>
-                           <children>
-                              <Button mnemonicParsing="false" onAction="#outputHierarchy" text="Output hierarchy" />
-                              <Button mnemonicParsing="false" onAction="#outputControlFlow" text="Output control flow" />
-                           </children>
-                        </HBox>
-                     </children>
-                  </VBox>
+                  <PieChart fx:id="chart" title="File Contents" />
                </children>
             </HBox>
             <VBox>
                <children>
                   <Label text="Libraries:" />
                   <TreeTableView fx:id="archiveTable" prefHeight="200.0" prefWidth="200.0">
-                    <columns>
-                      <TreeTableColumn fx:id="archiveNameCol" prefWidth="544.0" text="Library" />
-                      <TreeTableColumn fx:id="archiveDateCol" minWidth="0.0" prefWidth="167.0" text="Packaged On" />
+                     <columns>
+                        <TreeTableColumn fx:id="archiveNameCol" prefWidth="544.0" text="Library" />
+                        <TreeTableColumn fx:id="archiveDateCol" minWidth="0.0" prefWidth="167.0" text="Packaged On" />
                         <TreeTableColumn fx:id="archiveOwnershipCol" prefWidth="138.0" text="Built By" />
-                    </columns>
+                     </columns>
                   </TreeTableView>
                   <VBox>
                      <children>
