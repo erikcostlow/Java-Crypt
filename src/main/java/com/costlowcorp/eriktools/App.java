@@ -35,7 +35,7 @@ public class App extends Application {
     }
 
     private static final TaskProgressView taskView = makeDetailPane();
-    private static final MasterDetailPane masterDetail = new MasterDetailPane(Side.BOTTOM, new Label("Not set yet"), taskView, true);;
+    private static final MasterDetailPane masterDetail = new MasterDetailPane(Side.BOTTOM, new Label("Not set yet"), taskView, true);
 
     @Override
     public void start(Stage stage) throws Exception {

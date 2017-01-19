@@ -5,101 +5,132 @@
  */
 package test;
 
+import com.costlowcorp.eriktools.scanners.BuildHierarchyTask;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.LongAdder;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.stage.Stage;
 import org.gephi.graph.api.DirectedGraph;
-import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.GraphModel;
-import org.gephi.graph.api.Node;
 import org.gephi.io.exporter.api.ExportController;
 import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.Opcodes;
 import org.openide.util.Lookup;
 
 /**
  *
  * @author ecostlow
  */
-public class Blah {
+public class Blah extends Application {
 
-    private static GraphModel graphModel;
-    private static DirectedGraph directedGraph;
-    
-    private static int extension;
+    public static void main(String[] args) throws MalformedURLException, IOException, InterruptedException, ExecutionException {
+        launch(args);
+    }
 
-    public static void main(String[] args) throws MalformedURLException, IOException {
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        final Label go = new Label("lkdjlkjdf");
+        final Scene scene = new Scene(go);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+
         ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
         pc.newProject();
         Workspace workspace = pc.getCurrentWorkspace();
+        final GraphModel graphModel = Lookup.getDefault().lookup(GraphController.class).getGraphModel(workspace);
+        final ExecutorService exec = Executors.newSingleThreadExecutor();
+        final int extension = graphModel.addEdgeType("extends");
+        final DirectedGraph directedGraph = graphModel.getDirectedGraph();
 
-        //Get a graph model - it exists because we have a workspace
-        graphModel = Lookup.getDefault().lookup(GraphController.class).getGraphModel(workspace);
-        extension = graphModel.addEdgeType("extends");
-        directedGraph = graphModel.getDirectedGraph();
-
-        final Path path = Paths.get("C:\\Apps\\apache-maven-3.2.1\\lib\\guava-14.0.1.jar");
-        try (InputStream in = Files.newInputStream(path);
-                ZipInputStream zis = new ZipInputStream(in)) {
-            for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
-                //System.out.println(entry.getName());
-                if (entry.getName().toLowerCase().endsWith(".class")) {
-                    processClass(entry, zis);
-                }
-            }
+        if (graphModel.getNodeTable().getColumn("haveCode") == null) {
+            graphModel.getNodeTable().addColumn("haveCode", Boolean.class);
         }
+
+        final String javaHome = System.getProperty("java.home");
+        final Path rtJar = Paths.get(javaHome, "lib", "rt.jar");
+        System.out.println("Processing " + rtJar);
+        System.out.println("Building JRE hierarchy");
+        final BuildHierarchyTask task1 = new BuildHierarchyTask(rtJar, directedGraph);
+        exec.submit(task1);
+        System.out.println("Done");
+
+        final Path tomcatPath = Paths.get("/home/erik/devel/apache-tomcat-8.0.27/lib", "tomcat-websocket.jar");
+        final BuildHierarchyTask task2 = new BuildHierarchyTask(tomcatPath, directedGraph);
+        exec.submit(task2);
+
         ExportController ec = Lookup.getDefault().lookup(ExportController.class);
         //GraphExporter exporter = (GraphExporter) ec.getExporter("gexf");
+        DirectedGraph check = task1.get();
+        check = task2.get();
         try {
             ec.exportFile(new File("io_gexf.gexf"));
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-    }
 
-    private static void processClass(ZipEntry entry, ZipInputStream zis) throws IOException {
-        final ClassReader reader = new ClassReader(zis);
-        final ClassVisitor v = new ClassVisitor(Opcodes.ASM5) {
-            @Override
-            public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
-                final StringBuilder sb = new StringBuilder(entry.getName());
-                final String printName;
-                if (interfaces != null && interfaces.length > 0) {
-                    printName = superName + ", " + String.join(", ", interfaces);
-                } else {
-                    printName = superName;
+        final LongAdder classes = new LongAdder();
+        final LongAdder edges = new LongAdder();
+        final Set<String> orphans = new HashSet<>();
+
+        final Path mxGraph = Paths.get("mxGraph.js");
+        final Path cytoscape = Paths.get("cytoscape.js");
+        try (final OutputStream mxOut = Files.newOutputStream(mxGraph);
+                final OutputStream cytoOut = Files.newOutputStream(cytoscape);
+                final PrintWriter mxPrint = new PrintWriter(mxOut);
+            final PrintWriter cytoPrint = new PrintWriter(cytoOut);) {
+            
+            cytoPrint.println("nodes: [");
+            directedGraph.getNodes().iterator().forEachRemaining(node -> {
+                final String s = String.valueOf(node.getId());
+                mxPrint.println("erik['" + s + "'] = graph.insertVertex(parent, null, '" + s + "', 0, 0, 80, 30);");
+                cytoPrint.println("{ data: { id: '" + s + "' } },");
+                final AtomicBoolean hasOutgoing = new AtomicBoolean();
+                directedGraph.getEdges(node).forEach(edge -> {
+                    if (!hasOutgoing.get()) {
+                        hasOutgoing.set(edge.getTarget() != node);
+                    }
+                });
+
+                if (!hasOutgoing.get()) {
+                    orphans.add(String.valueOf(node.getId()));
                 }
-                System.out.println(name + " : " + printName);
-                final Node self = findOrCreate(name);
-                final Node parent = findOrCreate(superName);
-                if (directedGraph.getEdge(self, parent) == null) {
-                    final Edge edge = graphModel.factory().newEdge(self, parent, extension, true);
-                    directedGraph.addEdge(edge);
-                }
-                super.visit(version, access, name, signature, superName, interfaces);
-            }
-
-        };
-        reader.accept(v, ClassReader.SKIP_CODE);
-    }
-
-    private static Node findOrCreate(String id) {
-        if (directedGraph.hasNode(id)) {
-            return directedGraph.getNode(id);
+                classes.increment();
+            });
+            cytoPrint.println("],\nedges: [");
+            directedGraph.getEdges().forEach(edge -> {
+                final String source = String.valueOf(edge.getSource().getId());
+                final String target = String.valueOf(edge.getTarget().getId());
+                mxPrint.println("graph.insertEdge(parent, null, '', erik['" + source + "'], erik['" + target + "']);");
+                final String cyto = "{ data: { source: '" + source + "', target: '" + target + "' } },";
+                cytoPrint.println(cyto);
+                edges.increment();
+            });
+            cytoPrint.println("]");
+            System.out.println("done");
         }
-        Node node = graphModel.factory().newNode(id);
-        node.setLabel(id);
-        directedGraph.addNode(node);
-        return node;
+
+        System.out.println();
+        System.out.println("------------");
+        System.out.println("\tClasses: " + classes.longValue() + "\tEdges: " + edges.longValue());
+        System.out.println("\tOrphans:");
+        orphans.stream().forEach(o -> System.out.println("\t " + o));
+        exec.shutdown();
+        System.exit(0);
     }
 }

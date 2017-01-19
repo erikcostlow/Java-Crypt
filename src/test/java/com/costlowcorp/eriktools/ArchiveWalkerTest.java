@@ -33,7 +33,7 @@ import org.testng.annotations.Test;
  */
 public class ArchiveWalkerTest {
 
-    @Test
+    //@Test
     public void testWalkWar() throws IOException {
         final String war = "C:\\apps\\thing.ear";
         final Path path = Paths.get(war);

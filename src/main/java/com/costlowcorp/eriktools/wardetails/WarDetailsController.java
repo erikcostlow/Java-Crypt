@@ -11,6 +11,7 @@ import com.costlowcorp.eriktools.back.MadeBy;
 import com.costlowcorp.eriktools.jardetails.IdentifiedURL;
 import com.costlowcorp.eriktools.scanners.BuildHierarchyTask;
 import com.costlowcorp.fx.utils.DateApproximator;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -26,6 +27,8 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -48,6 +51,14 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.TextFieldTreeTableCell;
 import javafx.scene.input.MouseEvent;
+import org.controlsfx.control.Notifications;
+import org.gephi.graph.api.DirectedGraph;
+import org.gephi.graph.api.GraphController;
+import org.gephi.graph.api.GraphModel;
+import org.gephi.io.exporter.api.ExportController;
+import org.gephi.project.api.ProjectController;
+import org.gephi.project.api.Workspace;
+import org.openide.util.Lookup;
 
 /**
  * FXML Controller class
@@ -258,8 +269,26 @@ public class WarDetailsController implements Initializable {
         //3. Walk through methods
             //Same for method annotation classes
         //Output gexf
-        final BuildHierarchyTask task = new BuildHierarchyTask(path);
+        ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
+        pc.newProject();
+        Workspace workspace = pc.getCurrentWorkspace();
+        final GraphModel graphModel = Lookup.getDefault().lookup(GraphController.class).getGraphModel(workspace);
+        graphModel.addEdgeType("extends");
+        final DirectedGraph directedGraph = graphModel.getDirectedGraph();
+        final BuildHierarchyTask task = new BuildHierarchyTask(path, directedGraph);
+        task.setOnSucceeded((event) -> outputHierarchy());
         App.submitVisible(task);
+    }
+    
+    private void outputHierarchy(){
+        ExportController ec = Lookup.getDefault().lookup(ExportController.class);
+        //GraphExporter exporter = (GraphExporter) ec.getExporter("gexf");
+        try {
+            ec.exportFile(new File("io_gexf.gexf"));
+            Notifications.create().title("Done making hierarchy").text("See io_gexf").showInformation();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
     
     public void outputControlFlow(ActionEvent e){

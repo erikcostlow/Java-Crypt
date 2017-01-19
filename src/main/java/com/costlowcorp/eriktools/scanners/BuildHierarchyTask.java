@@ -38,19 +38,18 @@ public class BuildHierarchyTask extends Task<DirectedGraph> {
 
     private final Path path;
 
-    public BuildHierarchyTask(Path path) {
+    private final DirectedGraph directedGraph;
+
+    public BuildHierarchyTask(Path path, DirectedGraph directedGraph) {
         this.path = path;
+        this.directedGraph = directedGraph;
     }
 
     @Override
     protected DirectedGraph call() throws Exception {
-        ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
-        pc.newProject();
-        Workspace workspace = pc.getCurrentWorkspace();
-        final GraphModel graphModel = Lookup.getDefault().lookup(GraphController.class).getGraphModel(workspace);
-        final DirectedGraph directedGraph = graphModel.getDirectedGraph();
-        final int extension = graphModel.addEdgeType("extends");
-        graphModel.getNodeTable().addColumn("haveCode", Boolean.class);
+        final GraphModel graphModel = directedGraph.getModel();
+
+        final int extension = graphModel.getEdgeType("extends");
         updateMessage("Building hierarchy from " + path);
         try (InputStream in = Files.newInputStream(path);
                 ZipInputStream zin = new ZipInputStream(in)) {
@@ -69,7 +68,7 @@ public class BuildHierarchyTask extends Task<DirectedGraph> {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        /*
         updateMessage("Building remaining Java SE/EE hierarchy.");
         final String javaHome = System.getProperty("java.home");
         final Path rtJar = Paths.get(javaHome, "lib", "rt.jar");
@@ -123,26 +122,8 @@ public class BuildHierarchyTask extends Task<DirectedGraph> {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
+        }*/
         return directedGraph;
-    }
-
-    @Override
-    protected void succeeded() {
-        super.succeeded();
-        final DirectedGraph directedGraph = this.getValue();
-
-        ExportController ec = Lookup.getDefault().lookup(ExportController.class);
-        //GraphExporter exporter = (GraphExporter) ec.getExporter("gexf");
-        try {
-            final String filename = "io_gexf.gexf";
-            Notifications.create().title("Done building hierarchy").text("See " + filename).showInformation();
-
-            ec.exportFile(new File(filename));
-        } catch (IOException ex) {
-
-            ex.printStackTrace();
-        }
     }
 
     private static void processClass(DirectedGraph directedGraph, int extension, byte[] bytes) throws IOException {
@@ -151,11 +132,13 @@ public class BuildHierarchyTask extends Task<DirectedGraph> {
             @Override
             public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
                 final Node self = findOrCreate(directedGraph, name, true);
-                final Node parent = findOrCreate(directedGraph, superName, false);
-                if (directedGraph.getEdge(self, parent) == null) {
-                    final GraphModel graphModel = directedGraph.getModel();
-                    final Edge edge = graphModel.factory().newEdge(self, parent, extension, true);
-                    directedGraph.addEdge(edge);
+                if (superName != null) {//No superName for java/lang/Object
+                    final Node parent = findOrCreate(directedGraph, superName, false);
+                    if (parent != null && directedGraph.getEdge(self, parent) == null) {
+                        final GraphModel graphModel = directedGraph.getModel();
+                        final Edge edge = graphModel.factory().newEdge(self, parent, extension, true);
+                        directedGraph.addEdge(edge);
+                    }
                 }
                 super.visit(version, access, name, signature, superName, interfaces);
             }
@@ -165,13 +148,19 @@ public class BuildHierarchyTask extends Task<DirectedGraph> {
     }
 
     private static Node findOrCreate(DirectedGraph directedGraph, String id, boolean haveCode) {
-        final Node retval;
+        Node retval;
         if (directedGraph.hasNode(id)) {
             retval = directedGraph.getNode(id);
         } else {
-            retval = directedGraph.getModel().factory().newNode(id);
-            retval.setLabel(id);
-            directedGraph.addNode(retval);
+            try {
+                retval = directedGraph.getModel().factory().newNode(id);
+                retval.setLabel(id);
+                directedGraph.addNode(retval);
+            } catch (Exception e) {
+                System.err.println("Error on " + id);
+                e.printStackTrace();
+                retval = null;
+            }
         }
         if (haveCode) {
             retval.setAttribute("haveCode", true);
