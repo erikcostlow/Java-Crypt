@@ -150,6 +150,12 @@ public class URLIdentificationVisitor extends ClassVisitor {
                 final IdentifiedURL url = new IdentifiedURL(String.valueOf(value), className, methodNameAndDesc, "Servlet Filter");
                 addToMe.add(url);
                 System.out.println("    Found a WebFilter: " + value);
+            } else if ("Ljavax/websocket/server/ServerEndpoint;".equals(annotationClass)) {
+                final IdentifiedURL url = new IdentifiedURL(String.valueOf(value), className, methodNameAndDesc, "WebSocket Endpoint");
+                addToMe.add(url);
+            } else if ("Lorg/springframework/web/bind/annotation/RequestMapping;".equals(annotationClass)) {
+                final IdentifiedURL url = new IdentifiedURL(String.valueOf(value), className, methodNameAndDesc, "WebSocket Endpoint");
+                addToMe.add(url);
             }
             super.visit(name, value);
         }

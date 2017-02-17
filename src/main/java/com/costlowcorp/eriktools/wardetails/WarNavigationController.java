@@ -7,12 +7,24 @@ package com.costlowcorp.eriktools.wardetails;
 
 import com.costlowcorp.eriktools.App;
 import com.costlowcorp.eriktools.ErikUtils;
+import com.costlowcorp.eriktools.back.NestedInputStream;
+import com.costlowcorp.eriktools.code.XMLEditor;
+import com.costlowcorp.eriktools.files.FileTypeTask;
+import com.costlowcorp.eriktools.files.image.ImageShowerController;
+import com.costlowcorp.eriktools.jardetails.JarNavigationController;
 import com.costlowcorp.fx.utils.UIUtils;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -20,11 +32,15 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import org.controlsfx.control.Notifications;
+import org.openide.util.Exceptions;
 
 /**
  * FXML Controller class
@@ -65,8 +81,13 @@ public class WarNavigationController implements Initializable {
                 }
             }else{
                 final String filename = newValue.getValue().actualFileProperty().get();
-                final String extension = ErikUtils.getExtension(filename);
-                System.out.println("Selection is " + filename);
+                Logger.getLogger(WarNavigationController.class.getSimpleName()).info("Selection is " + filename);
+                final String[] split = filename.split("->");
+                
+                
+                final FileTypeTask task = new FileTypeTask(path, split, detailsPane);
+                
+                App.submitInvisible(task);
             }
         });
     }

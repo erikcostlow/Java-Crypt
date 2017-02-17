@@ -93,7 +93,7 @@ public class CodeEditor{
                 return computeHighlighting(text);
             }
         };
-        App.submitVisible(task);
+        App.submitInvisible(task);
         return task;
     }
 

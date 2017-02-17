@@ -20,6 +20,11 @@ public class NestedInputStream extends InputStream {
 
     final ZipInputStream parent;
 
+    @Override
+    public void close() throws IOException {
+        super.close();
+    }
+
     public NestedInputStream(ZipInputStream zis) {
         this.parent = zis;
     }
