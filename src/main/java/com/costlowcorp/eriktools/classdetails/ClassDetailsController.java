@@ -59,6 +59,7 @@ public class ClassDetailsController implements Initializable {
     public void populateAsmifierTab(String text){
         final CodeArea field = CodeEditor.make(text);
         field.setEditable(false);
+        field.selectRange(0, 0);
         VBox.setVgrow(field, Priority.ALWAYS);
         asmifierTab.setContent(field);
     }
