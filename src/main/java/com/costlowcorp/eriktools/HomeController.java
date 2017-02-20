@@ -10,6 +10,7 @@ import com.costlowcorp.eriktools.checksum.ChecksumFileController;
 import com.costlowcorp.eriktools.eardetails.EarNavigationController;
 import com.costlowcorp.eriktools.jardetails.JarDetailsController;
 import com.costlowcorp.eriktools.jardetails.JarNavigationController;
+import com.costlowcorp.eriktools.preferences.TinkerPopPreferencesController;
 import com.costlowcorp.eriktools.wardetails.WarDetailsController;
 import com.costlowcorp.eriktools.wardetails.WarNavigationController;
 import com.costlowcorp.fx.utils.UIUtils;
@@ -137,17 +138,32 @@ public class HomeController implements Initializable {
             tabs.getSelectionModel().select(newTab);
         }
     }
+    
+    public void openPreferences(ActionEvent event) {
+        final FXMLLoader loader = UIUtils.load(TinkerPopPreferencesController.class);
+        final TinkerPopPreferencesController controller = loader.getController();
+        
+        Parent root = loader.getRoot();
+        final Stage stage = makeModal("Preferences", root);
+        controller.setOnSave(() -> stage.close());
+        stage.show();
+    }
 
     public void openAbout(ActionEvent event) {
-        Stage stage = new Stage();
         final FXMLLoader loader = UIUtils.load(AboutController.class);
         Parent root = loader.getRoot();
+        final Stage stage = makeModal("About", root);
+        stage.show();
+    }
+    
+    private Stage makeModal(String title, Parent root){
+        Stage stage = new Stage();
         stage.setScene(new Scene(root));
-        stage.setTitle("About");
+        stage.setTitle(title);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.initOwner(
                 tabs.getScene().getWindow());
-        stage.show();
+        return stage;
     }
 
     private Node loadCertificatesFrom(File file) throws CertificateException, IOException {

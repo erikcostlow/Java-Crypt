@@ -16,37 +16,27 @@ import java.util.Arrays;
 import java.util.zip.ZipInputStream;
 import javafx.concurrent.Task;
 import org.controlsfx.control.Notifications;
-import org.gephi.graph.api.DirectedGraph;
-import org.gephi.graph.api.Edge;
-import org.gephi.graph.api.GraphController;
-import org.gephi.graph.api.GraphModel;
-import org.gephi.graph.api.Node;
-import org.gephi.io.exporter.api.ExportController;
-import org.gephi.project.api.ProjectController;
-import org.gephi.project.api.Workspace;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;
-import org.openide.util.Exceptions;
-import org.openide.util.Lookup;
 
 /**
  *
  * @author Erik Costlow
  */
-public class BuildHierarchyTask extends Task<DirectedGraph> {
+public class BuildHierarchyTask extends Task {
 
     private final Path path;
 
-    private final DirectedGraph directedGraph;
+    
 
-    public BuildHierarchyTask(Path path, DirectedGraph directedGraph) {
+    public BuildHierarchyTask(Path path) {
         this.path = path;
-        this.directedGraph = directedGraph;
     }
 
     @Override
-    protected DirectedGraph call() throws Exception {
+    protected Object call() throws Exception {
+        /*
         final GraphModel graphModel = directedGraph.getModel();
 
         final int extension = graphModel.getEdgeType("extends");
@@ -68,6 +58,7 @@ public class BuildHierarchyTask extends Task<DirectedGraph> {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        */
         /*
         updateMessage("Building remaining Java SE/EE hierarchy.");
         final String javaHome = System.getProperty("java.home");
@@ -123,9 +114,9 @@ public class BuildHierarchyTask extends Task<DirectedGraph> {
                 e.printStackTrace();
             }
         }*/
-        return directedGraph;
+        return null;
     }
-
+/*
     private static void processClass(DirectedGraph directedGraph, int extension, byte[] bytes) throws IOException {
         final ClassReader reader = new ClassReader(bytes);
         final ClassVisitor v = new ClassVisitor(Opcodes.ASM5) {
@@ -167,4 +158,5 @@ public class BuildHierarchyTask extends Task<DirectedGraph> {
         }
         return retval;
     }
+*/
 }

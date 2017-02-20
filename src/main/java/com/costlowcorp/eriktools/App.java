@@ -17,6 +17,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.controlsfx.control.MasterDetailPane;
 import org.controlsfx.control.TaskProgressView;
 
@@ -27,6 +28,8 @@ import org.controlsfx.control.TaskProgressView;
 public class App extends Application {
 
     private static final ErikThreadExecutor EXECUTOR = ErikThreadExecutor.INSTANCE;
+    
+    private static GraphMaker GRAPH_MAKER = GraphMaker.IN_MEMORY;
 
     private static Application SELF;
 
@@ -87,5 +90,14 @@ public class App extends Application {
     
     public static final void submitInvisible(Task task) {
         EXECUTOR.submit(task);
+    }
+    
+    public static void setGraphMaker(GraphMaker maker){
+        if(maker!=null){
+            GRAPH_MAKER=maker;
+        }
+    }
+    public static Graph makeGraph(){
+        return GRAPH_MAKER.makeGraph();
     }
 }

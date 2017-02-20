@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.openide.util.Exceptions;
 import org.testng.annotations.Test;
 
 /**
@@ -43,7 +42,7 @@ public class NestedFileReader {
             final String s = new String(bout.toByteArray());
             System.out.println(s);
         } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
+            ex.printStackTrace();
         }
     }
 }

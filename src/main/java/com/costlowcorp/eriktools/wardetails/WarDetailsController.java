@@ -52,13 +52,6 @@ import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.TextFieldTreeTableCell;
 import javafx.scene.input.MouseEvent;
 import org.controlsfx.control.Notifications;
-import org.gephi.graph.api.DirectedGraph;
-import org.gephi.graph.api.GraphController;
-import org.gephi.graph.api.GraphModel;
-import org.gephi.io.exporter.api.ExportController;
-import org.gephi.project.api.ProjectController;
-import org.gephi.project.api.Workspace;
-import org.openide.util.Lookup;
 
 /**
  * FXML Controller class
@@ -269,29 +262,12 @@ public class WarDetailsController implements Initializable {
         //3. Walk through methods
             //Same for method annotation classes
         //Output gexf
-        ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
-        pc.newProject();
-        Workspace workspace = pc.getCurrentWorkspace();
-        final GraphModel graphModel = Lookup.getDefault().lookup(GraphController.class).getGraphModel(workspace);
-        graphModel.addEdgeType("extends");
-        final DirectedGraph directedGraph = graphModel.getDirectedGraph();
-        final BuildHierarchyTask task = new BuildHierarchyTask(path, directedGraph);
-        task.setOnSucceeded((event) -> outputHierarchy());
-        App.submitVisible(task);
-    }
-    
-    private void outputHierarchy(){
-        ExportController ec = Lookup.getDefault().lookup(ExportController.class);
-        //GraphExporter exporter = (GraphExporter) ec.getExporter("gexf");
-        try {
-            ec.exportFile(new File("io_gexf.gexf"));
-            Notifications.create().title("Done making hierarchy").text("See io_gexf").showInformation();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        final Notifications notification = Notifications.create().title("TODO").text("Replace hierarhcy with Tinkerpop");
+        notification.showError();
     }
     
     public void outputControlFlow(ActionEvent e){
-        
+        final Notifications notification = Notifications.create().title("TODO").text("Replace control flow with Tinkerpop");
+        notification.showError();
     }
 }

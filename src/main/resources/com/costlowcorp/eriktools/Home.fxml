@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.costlowcorp.eriktools.HomeController">
+<VBox xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.costlowcorp.eriktools.HomeController">
    <children>
       <MenuBar useSystemMenuBar="true">
         <menus>
@@ -25,6 +25,7 @@
           <Menu mnemonicParsing="false" text="Tools">
             <items>
               <MenuItem mnemonicParsing="false" onAction="#openChecksum" text="Checksum" />
+                  <MenuItem mnemonicParsing="false" onAction="#openPreferences" text="Preferences" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Help">

@@ -41,7 +41,6 @@ import org.objectweb.asm.util.ASMifier;
 import org.objectweb.asm.util.Printer;
 import org.objectweb.asm.util.Textifier;
 import org.objectweb.asm.util.TraceClassVisitor;
-import org.openide.util.Exceptions;
 
 /**
  *
@@ -95,7 +94,7 @@ public class FileTypeTask extends Task<Node> {
                             bout.write(bytes, 0, length);
                         }
                     } catch (IOException ex) {
-                        Exceptions.printStackTrace(ex);
+                        ex.printStackTrace();
                     }
                     txt.setText(bout.toString());
                 };
@@ -111,7 +110,7 @@ public class FileTypeTask extends Task<Node> {
                             bout.write(bytes, 0, length);
                         }
                     } catch (IOException ex) {
-                        Exceptions.printStackTrace(ex);
+                        ex.printStackTrace();
                     }
                     end = XMLEditor.make(bout.toString());
                 };
@@ -137,7 +136,7 @@ public class FileTypeTask extends Task<Node> {
                         classDetails.populateAsmifierTab(bout.toString());
 
                     } catch (IOException ex) {
-                        Exceptions.printStackTrace(ex);
+                        ex.printStackTrace();
                     }
                 };
                 blah(readClass);

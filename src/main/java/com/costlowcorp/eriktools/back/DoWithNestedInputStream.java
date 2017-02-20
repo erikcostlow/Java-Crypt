@@ -7,11 +7,9 @@ package com.costlowcorp.eriktools.back;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import org.openide.util.Exceptions;
 
 /**
  *
@@ -32,7 +30,7 @@ public class DoWithNestedInputStream {
         try(ZipInputStream zin = new ZipInputStream(in)){
             walkThrough(zin, 0);
         } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
+            ex.printStackTrace();
         }
     }
     
@@ -46,7 +44,7 @@ public class DoWithNestedInputStream {
                 }
             }
         } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
+            ex.printStackTrace();
         }
         return keepGoing;
     }
