@@ -8,6 +8,7 @@ package com.costlowcorp.eriktools;
 import java.util.Arrays;
 import java.util.Optional;
 import org.apache.tinkerpop.gremlin.structure.Graph;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 
 /**
@@ -18,7 +19,8 @@ public enum GraphMaker {
     IN_MEMORY("In Memory") {
         @Override
         public Graph makeGraph() {
-            Graph g = TinkerGraph.open();
+            TinkerGraph g = TinkerGraph.open();
+            g.createIndex("name", Vertex.class);
             return g;
         }
     },

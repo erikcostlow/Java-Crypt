@@ -4,6 +4,7 @@
  */
 package com.costlowcorp.eriktools.scanners;
 
+import com.costlowcorp.eriktools.ErikUtils;
 import com.costlowcorp.eriktools.back.ArchiveWalker;
 import com.costlowcorp.eriktools.back.ArchiveWalkerRecipient;
 import java.io.File;
@@ -13,8 +14,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.zip.ZipInputStream;
 import javafx.concurrent.Task;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
+import org.apache.tinkerpop.gremlin.structure.Graph;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.controlsfx.control.Notifications;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
@@ -27,15 +33,42 @@ import org.objectweb.asm.Opcodes;
 public class BuildHierarchyTask extends Task {
 
     private final Path path;
+    private final Graph graph;
+    private final long totalFilesWithFolders;
 
-    
-
-    public BuildHierarchyTask(Path path) {
+    public BuildHierarchyTask(Path path, Graph graph, long totalFilesWithFolders) {
         this.path = path;
+        this.graph = graph;
+        this.totalFilesWithFolders=totalFilesWithFolders;
     }
 
     @Override
     protected Object call() throws Exception {
+        try (InputStream in = Files.newInputStream(path);
+                ZipInputStream zin = new ZipInputStream(in)) {
+            final LongAdder counter = new LongAdder();
+
+            final ArchiveWalkerRecipient eachFile = (t, entry, u) -> {
+                counter.increment();
+                final String extension = ErikUtils.getExtension(entry.getName());
+                if (ArchiveWalker.ARCHIVE_FORMATS.contains(extension)) {
+                    updateMessage("Hierarchy: " + String.join("->", t));
+                    updateProgress(counter.longValue(), totalFilesWithFolders);
+                }
+                if (entry.getName().toLowerCase().endsWith(".class")) {
+                    try {
+                        processClass(graph, ArchiveWalker.currentEntry(u));
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            };
+
+            final ArchiveWalker walker = new ArchiveWalker(path.toString(), zin, eachFile);
+            walker.walk();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         /*
         final GraphModel graphModel = directedGraph.getModel();
 
@@ -58,8 +91,8 @@ public class BuildHierarchyTask extends Task {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        */
-        /*
+         */
+ /*
         updateMessage("Building remaining Java SE/EE hierarchy.");
         final String javaHome = System.getProperty("java.home");
         final Path rtJar = Paths.get(javaHome, "lib", "rt.jar");
@@ -116,7 +149,8 @@ public class BuildHierarchyTask extends Task {
         }*/
         return null;
     }
-/*
+
+    /*
     private static void processClass(DirectedGraph directedGraph, int extension, byte[] bytes) throws IOException {
         final ClassReader reader = new ClassReader(bytes);
         final ClassVisitor v = new ClassVisitor(Opcodes.ASM5) {
@@ -158,5 +192,33 @@ public class BuildHierarchyTask extends Task {
         }
         return retval;
     }
-*/
+     */
+
+    private void processClass(Graph graph, byte[] bytes) {
+        final ClassReader reader = new ClassReader(bytes);
+        final ClassVisitor v = new ClassVisitor(Opcodes.ASM5) {
+            @Override
+            public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+                final Vertex current = findOrCreate(name);
+                current.property("haveCode", true);
+                if(superName!=null){
+                    final Vertex superClass = findOrCreate(superName);
+                    current.addEdge("isa", superClass);
+                }
+                Arrays.stream(interfaces).forEach(iface -> {
+                    final Vertex ifaceV = findOrCreate(iface);
+                    current.addEdge("isa", ifaceV);
+                });
+            }
+        };
+        reader.accept(v, ClassReader.SKIP_CODE);
+    }
+
+    private Vertex findOrCreate(String name) {
+        final GraphTraversal<Vertex, Vertex> tv = graph.traversal().V().has("name", name);
+        if (tv.hasNext()) {
+            return tv.next();
+        }
+        return graph.addVertex("name", name);
+    }
 }

@@ -24,7 +24,7 @@ import java.util.zip.ZipInputStream;
  */
 public class ArchiveWalker {
 
-    private static final Set<String> ARCHIVE_FORMATS;
+    public static final Set<String> ARCHIVE_FORMATS;
 
     static {
         final Set<String> temp = new HashSet<>();

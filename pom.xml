@@ -49,6 +49,8 @@
             <groupId>org.benf</groupId>
             <artifactId>cfr</artifactId>
             <version>0.119</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/src/lib/cfr_0_119.jar</systemPath>
         </dependency>
         <!--dependency>
             <groupId>org.antlr</groupId>
